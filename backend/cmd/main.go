@@ -10,7 +10,6 @@ import (
 	"github.com/redis/go-redis/v9"
 	"github.com/rs/zerolog/log"
 	"gitlab.com/smwbalfe/spotify-client"
-
 	"backend/internal/api"
 	"backend/internal/config"
 	"backend/internal/db"
