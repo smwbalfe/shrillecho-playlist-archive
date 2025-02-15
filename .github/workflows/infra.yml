@@ -82,13 +82,14 @@ jobs:
 
   ssh_and_echo:
     needs: terraform
+    environment: shrillecho
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
     
     - name: Dump Environment Variables
       env:
-        HOST: ${{ needs.terraform.outputs.droplet_ip }}
+        HOST: ${{ terraform.outputs.droplet_ip }}
         USER: root
         KEY: ${{ secrets.SSH_PRIVATE_KEY }}
       run: |
