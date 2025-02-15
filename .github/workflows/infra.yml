@@ -92,4 +92,7 @@ jobs:
         USER: root
         KEY: ${{ secrets.SSH_PRIVATE_KEY }}
       run: |
-        ssh -o StrictHostKeyChecking=no -i <(echo "${KEY}") ${USER}@${HOST} "echo 'Hello, World!' > hello.txt"
+        mkdir -p ~/.ssh
+        echo "$KEY" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${USER}@${HOST} "echo 'Hello, World!' > hello.txt"
