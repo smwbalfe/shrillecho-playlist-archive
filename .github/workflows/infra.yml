@@ -2,7 +2,7 @@ name: 'Infra Pipeline'
 on:
   push:
     paths:
-      - 'scraper/**'
+      - 'infra/**'
   pull_request:
   workflow_dispatch:
 
