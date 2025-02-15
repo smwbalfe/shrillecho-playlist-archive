@@ -89,7 +89,7 @@ jobs:
     
     - name: Dump Environment Variables
       env:
-        HOST: ${{ jobs.terraform.outputs.droplet_ip }}
+        HOST: ${{ needs.terraform.outputs.droplet_ip }}
         USER: root
         KEY: ${{ secrets.SSH_PRIVATE_KEY }}
       run: |
