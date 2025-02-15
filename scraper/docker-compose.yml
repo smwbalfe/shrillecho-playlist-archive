@@ -1,0 +1,9 @@
+version: '3.8'
+
+services:
+  child:
+    image: scrape-child:latest
+    env_file:
+      - .env
+    restart: unless-stopped
+    network_mode: "host"
