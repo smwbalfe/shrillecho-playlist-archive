@@ -7,6 +7,15 @@ terraform {
   }
 }
 
+terraform {
+  backend "s3" {
+    bucket = "shrillecho-tf-state"
+    key    = "terraform.tfstate"
+    region = "eu-west-2"
+    encrypt = true
+  }
+}
+
 provider "digitalocean" {
   token = var.do_token
 }
