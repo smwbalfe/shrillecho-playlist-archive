@@ -78,7 +78,7 @@ jobs:
 
     - name: Store Droplet IP
       id: droplet_ip
-      run: bash ../../../scripts/ci/read_droplet_ip.sh
+      run: bash ../../scripts/ci/read_droplet_ip.sh
 
   ssh_and_echo:
     needs: terraform
