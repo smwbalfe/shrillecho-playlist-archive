@@ -28,4 +28,4 @@ jobs:
     - name: Terraform Plan
       run: terraform plan
       env:
-        do_token: ${{ secrets.DO_TOKEN }}
+        TF_VAR_do_token: ${{ secrets.DO_TOKEN }}
