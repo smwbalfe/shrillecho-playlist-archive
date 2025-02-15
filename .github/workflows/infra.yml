@@ -5,6 +5,7 @@ on:
     paths:
       - 'scraper/**'
   pull_request:
+  workflow_dispatch:
 
 env:
   TF_WORKING_DIR: './infra/terraform'
