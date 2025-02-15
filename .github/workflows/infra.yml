@@ -75,3 +75,21 @@ jobs:
       run: terraform apply -auto-approve
       env:
         TF_VAR_do_token: ${{ secrets.DO_TOKEN }}
+
+    - name: Store Droplet IP
+      id: droplet_ip
+      run: echo "droplet_ip=$(terraform output -raw droplet_ip)" >> $GITHUB_OUTPUT
+
+  ssh_and_echo:
+    needs: terraform
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: SSH into Droplet and Echo
+      env:
+        HOST: ${{ needs.terraform.outputs.droplet_ip }}
+        USER: root
+        KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      run: |
+        ssh -o StrictHostKeyChecking=no -i <(echo "${KEY}") ${USER}@${HOST} "echo 'Hello, World!' > hello.txt"
