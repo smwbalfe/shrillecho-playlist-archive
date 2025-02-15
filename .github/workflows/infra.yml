@@ -20,28 +20,22 @@ jobs:
     
     steps:
     - uses: actions/checkout@v4
-    
     - uses: hashicorp/setup-terraform@v3
     
     - name: Terraform Init
       run: terraform init
     
-    - name: Terraform Plan Destroy
-      run: terraform plan -destroy -out=destroy.tfplan
-      env:
-        TF_VAR_do_token: ${{ secrets.DO_TOKEN }}
-    
     - name: Terraform Destroy
-      run: terraform apply "destroy.tfplan"
+      run: terraform destroy -auto-approve
       env:
         TF_VAR_do_token: ${{ secrets.DO_TOKEN }}
     
     - name: Terraform Plan
-      run: terraform plan -out=apply.tfplan
+      run: terraform plan
       env:
         TF_VAR_do_token: ${{ secrets.DO_TOKEN }}
     
     - name: Terraform Apply
-      run: terraform apply "apply.tfplan"
+      run: terraform apply -auto-approve
       env:
         TF_VAR_do_token: ${{ secrets.DO_TOKEN }}
