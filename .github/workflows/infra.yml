@@ -86,13 +86,12 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
-    - name: SSH into Droplet and Echo
+    - name: Dump Environment Variables
       env:
         HOST: ${{ needs.terraform.outputs.droplet_ip }}
         USER: root
         KEY: ${{ secrets.SSH_PRIVATE_KEY }}
       run: |
-        mkdir -p ~/.ssh
-        echo "$KEY" > ~/.ssh/id_rsa
-        chmod 600 ~/.ssh/id_rsa
-        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${USER}@${HOST} "echo 'Hello, World!' > hello.txt"
+        echo "HOST: $HOST"
+        echo "USER: $USER"
+        echo "KEY: $KEY"
