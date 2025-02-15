@@ -88,14 +88,15 @@ jobs:
     environment: shrillecho
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Dump Environment Variables
-      env:
-        HOST: ${{ needs.terraform.outputs.droplet_ip }}
-        USER: root
-        KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-      run: |
-        echo "HOST: $HOST"
-        echo "USER: $USER"
-        echo "KEY: $KEY"
+      - uses: actions/checkout@v4
+      
+      - name: Write hello world to remote
+        env:
+          HOST: ${{ needs.terraform.outputs.droplet_ip }}
+          USER: root
+          KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        run: |
+          echo "$KEY" > private_key
+          chmod 600 private_key
+          echo "Hello World!" | ssh -i private_key -o StrictHostKeyChecking=no $USER@$HOST 'cat > ~/hello.txt'
+          rm private_key
