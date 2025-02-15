@@ -26,3 +26,5 @@ jobs:
 
     - name: Terraform Plan
       run: terraform plan
+      env:
+        TF_VAR_scraper_username: ${{ secrets.DO_TOKEN }}

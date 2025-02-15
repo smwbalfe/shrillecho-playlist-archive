@@ -86,7 +86,6 @@ func main() {
 
 	api := api.NewApi(ctx, sharedCfg, &apiCfg)
 
-	
 	artistScraperWorker := workers.NewArtistScrapeWorker(sharedCfg)
 
 	queueCtx, cancel := context.WithCancel(ctx)

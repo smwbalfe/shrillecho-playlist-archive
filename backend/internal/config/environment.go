@@ -23,7 +23,7 @@ func LoadEnv() Environment {
 			RedisHost:      "redis",
 			RedisPort:      "6379",
 			PostgresHost:   "db",
-			AllowedOrigins: []string{"https://shrillecho.app"},
+			AllowedOrigins: [] string{"https://shrillecho.app"},
 			ServerHost:     "",
 			ServerPort:     "8000",
 		}
@@ -33,7 +33,7 @@ func LoadEnv() Environment {
 		RedisHost:      "localhost",
 		RedisPort:      "6379",
 		PostgresHost:   "localhost",
-		AllowedOrigins: []string{"http://localhost:3000", "http://localhost:3000/"},
+		AllowedOrigins: [] string{"http://localhost:3000", "http://localhost:3000/"},
 		ServerHost:     "localhost",
 		ServerPort:     "8000",
 	}

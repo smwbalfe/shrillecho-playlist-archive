@@ -104,11 +104,9 @@ func main() {
         }(i)
     }
 
-
     sig := <-sigChan
     log.Info().Str("signal", sig.String()).Msg("Received shutdown signal")
     
-
     log.Info().Msg("Initiating graceful shutdown...")
     cancel()
     
