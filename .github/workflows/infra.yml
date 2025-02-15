@@ -20,6 +20,14 @@ jobs:
     
     steps:
     - uses: actions/checkout@v4
+    
+    - name: Download previous Terraform state
+      uses: actions/download-artifact@v4
+      continue-on-error: true  
+      with:
+        name: tf-state
+        path: ${{ env.TF_WORKING_DIR }}
+    
     - uses: hashicorp/setup-terraform@v3
     
     - name: Terraform Init
@@ -39,3 +47,13 @@ jobs:
       run: terraform apply -auto-approve
       env:
         TF_VAR_do_token: ${{ secrets.DO_TOKEN }}
+  
+    - name: Upload Terraform state
+      if: success()  
+      uses: actions/upload-artifact@v4
+      with:
+        name: tf-state
+        path: |
+          ${{ env.TF_WORKING_DIR }}/*.tfstate
+          ${{ env.TF_WORKING_DIR }}/*.tfstate.backup
+        retention-days: 90  
