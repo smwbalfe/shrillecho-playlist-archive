@@ -13,6 +13,7 @@ env:
 jobs:
   terraform:
     runs-on: ubuntu-latest
+    environment: shrillecho
     defaults:
       run:
         working-directory: ${{ env.TF_WORKING_DIR }}
