@@ -5,8 +5,10 @@ on:
       - 'scraper/**'
   pull_request:
   workflow_dispatch:
+
 env:
   TF_WORKING_DIR: './infra/terraform'
+  BUCKET_NAME: shrillecho-tf-state
 
 jobs:
   create_state_bucket:
@@ -18,18 +20,34 @@ jobs:
     
     steps:
     - uses: actions/checkout@v4
+    
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v4
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ vars.AWS_REGION }}
+
+    - name: Check if bucket exists
+      id: check_bucket
+      run: |
+        if aws s3api head-bucket --bucket $BUCKET_NAME 2>/dev/null; then
+          echo "Bucket already exists, skipping creation"
+          echo "bucket_exists=true" >> $GITHUB_OUTPUT
+        else
+          echo "Bucket does not exist, will create"
+          echo "bucket_exists=false" >> $GITHUB_OUTPUT
+        fi
+
     - uses: hashicorp/setup-terraform@v3
+      if: steps.check_bucket.outputs.bucket_exists == 'false'
     
     - name: Terraform Init
+      if: steps.check_bucket.outputs.bucket_exists == 'false'
       run: terraform init
     
     - name: Create State Bucket
+      if: steps.check_bucket.outputs.bucket_exists == 'false'
       run: terraform apply -auto-approve
 
   terraform:
@@ -42,12 +60,14 @@ jobs:
     
     steps:
     - uses: actions/checkout@v4
+    
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v4
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ vars.AWS_REGION }}
+    
     - uses: hashicorp/setup-terraform@v3
     
     - name: Terraform Init
