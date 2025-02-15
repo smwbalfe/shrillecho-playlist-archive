@@ -1,0 +1,27 @@
+name: 'Infra Pipeline'
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+env:
+  TF_WORKING_DIR: './infra/terraform'
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ env.TF_WORKING_DIR }}
+
+    steps:
+    - uses: actions/checkout@v4
+    - uses: hashicorp/setup-terraform@v3
+
+    - name: Terraform Init
+      run: terraform init
+      
+    - name: Terraform Plan
+      run: terraform plan
