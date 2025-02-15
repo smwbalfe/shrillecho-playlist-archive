@@ -40,7 +40,6 @@ if [ -z "${DROPLET_IP}" ]; then
 fi
 
 echo "Debug: Successfully extracted Droplet IP"
-echo "droplet_ip=${DROPLET_IP}"
 echo "droplet_ip=${DROPLET_IP}" >> $GITHUB_OUTPUT
 
 # Cleanup

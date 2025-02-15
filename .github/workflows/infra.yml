@@ -48,6 +48,8 @@ jobs:
     needs: create_state_bucket
     runs-on: ubuntu-latest
     environment: shrillecho
+    outputs:
+      droplet_ip: ${{ steps.droplet_ip.outputs.droplet_ip }} 
     defaults:
       run:
         working-directory: ${{ env.TF_WORKING_DIR }}
