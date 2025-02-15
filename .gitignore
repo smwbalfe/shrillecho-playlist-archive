@@ -20,8 +20,5 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 test/
-backend/scraper/
-scraper/
 nginx/etc/letsencrypt/
 .env
-scraper/
