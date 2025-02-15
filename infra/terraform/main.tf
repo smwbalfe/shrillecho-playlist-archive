@@ -1,13 +1,20 @@
 terraform {
  required_providers {
-   digitalocean = {
-     source  = "digitalocean/digitalocean"
-     version = "~> 2.0"
-   }
-   aws = {
-     source  = "hashicorp/aws"
-     version = "~> 5.0"
-   }
+  digitalocean = {
+    source  = "digitalocean/digitalocean"
+    version = "~> 2.0"
+  }
+  aws = {
+    source  = "hashicorp/aws"
+    version = "~> 5.0"
+  }
+ }
+
+backend "s3" {
+   bucket  = "shrillecho-tf-state"
+   key     = "terraform.tfstate"
+   region  = "eu-west-2"
+   encrypt = true
  }
 }
 
@@ -15,18 +22,10 @@ provider "digitalocean" {
  token = var.do_token
 }
 
-provider "aws" {
- region = "eu-west-2"
-}
-
 variable "do_token" {
  description = "DigitalOcean API Token"
  type        = string
  sensitive   = true
-}
-
-resource "aws_s3_bucket" "my_bucket" {
- bucket = "shrillecho-tf-state"
 }
 
 resource "digitalocean_droplet" "web" {
@@ -40,13 +39,4 @@ resource "digitalocean_droplet" "web" {
 
 output "droplet_ip" {
  value = digitalocean_droplet.web.ipv4_address
-}
-
-terraform {
- backend "s3" {
-   bucket  = "shrillecho-tf-state"
-   key     = "terraform.tfstate"
-   region  = "eu-west-2"
-   encrypt = true
- }
 }
