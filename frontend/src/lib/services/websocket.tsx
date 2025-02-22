@@ -14,16 +14,30 @@ import { Checkbox } from '@/src/lib/components/ui/checkbox';
 
 import env from '../config/env';
 
+// Debug logger utility
+const debugLog = (area: string, message: string, data?: any) => {
+    const timestamp = new Date().toISOString();
+    console.log(`[${timestamp}] [${area}] ${message}`, data ? data : '');
+};
+
 export default function WebSocketListener() {
     const [status, setStatus] = useState('Disconnected');
     const { app, setApp } = useApp();
+    const [connectionAttempts, setConnectionAttempts] = useState(0);
+    const [lastMessageTime, setLastMessageTime] = useState<Date | null>(null);
 
+    // Log app state changes
     useEffect(() => {
-        console.log('App artist responses updated:', app.scrapes);
+        debugLog('AppState', 'Scrapes updated', {
+            count: app.scrapes.length,
+            scrapes: app.scrapes
+        });
     }, [app.scrapes]);
 
+    // Initialize activeScrapes if needed
     useEffect(() => {
         if (!app.activeScrapes) {
+            debugLog('AppState', 'Initializing activeScrapes array');
             setApp(prevState => ({
                 ...prevState,
                 activeScrapes: []
@@ -31,73 +45,129 @@ export default function WebSocketListener() {
         }
     }, [app, setApp]);
 
+    // WebSocket connection and event handling
     useEffect(() => {
+        debugLog('WebSocket', 'Initializing WebSocket connection', {
+            url: env.NEXT_PUBLIC_WEBSOCKET_API,
+            attempt: connectionAttempts + 1
+        });
+
         const socket = new WebSocket(env.NEXT_PUBLIC_WEBSOCKET_API);
+        setConnectionAttempts(prev => prev + 1);
 
         socket.addEventListener('open', (event) => {
-            console.log('Connected to WebSocket server');
+            debugLog('WebSocket', 'Connection established', {
+                attempt: connectionAttempts,
+                readyState: socket.readyState
+            });
             setStatus('Connected');
         });
 
         socket.addEventListener('message', (event) => {
-            console.log('Message from server:', event.data);
+            const now = new Date();
+            setLastMessageTime(now);
+
+            debugLog('WebSocket', 'Raw message received', {
+                timestamp: now.toISOString(),
+                data: event.data,
+                timeSinceLastMessage: lastMessageTime
+                    ? `${now.getTime() - lastMessageTime.getTime()}ms`
+                    : 'First message'
+            });
+
             try {
                 const data: ScrapeResponse = JSON.parse(event.data);
-                console.log('Parsed data:', data);
+                debugLog('WebSocket', 'Parsed message data', {
+                    id: data.id,
+                    seedArtist: data.seed_artist,
+                    totalArtists: data.total_artists
+                });
+
                 if (data.id) {
                     setApp(prevState => {
                         const exists = prevState.scrapes.some(
                             response => response.id === data.id
                         );
 
+                        debugLog('AppState', exists ? 'Duplicate scrape detected' : 'New scrape received', {
+                            scrapeId: data.id,
+                            exists,
+                            currentScrapeCount: prevState.scrapes.length
+                        });
+
                         if (!exists) {
                             return {
                                 ...prevState,
-                                scrapes: [
-                                    ...prevState.scrapes,
-                                    data
-                                ]
+                                scrapes: [...prevState.scrapes, data]
                             };
                         }
                         return prevState;
                     });
                 } else {
-                    console.log('Received message missing ID field');
+                    debugLog('WebSocket', 'Invalid message format - missing ID', data);
                 }
             } catch (e) {
-                console.error('Error parsing WebSocket message:', e);
+                debugLog('WebSocket', 'Message parsing error', {
+                    error: e instanceof Error ? e.message : 'Unknown error',
+                    rawData: event.data
+                });
             }
         });
 
         socket.addEventListener('close', (event) => {
-            console.log('Disconnected from WebSocket server');
+            debugLog('WebSocket', 'Connection closed', {
+                code: event.code,
+                reason: event.reason,
+                wasClean: event.wasClean,
+                attempt: connectionAttempts
+            });
             setStatus('Disconnected');
         });
 
         socket.addEventListener('error', (event) => {
-            console.error('WebSocket error:', event);
+            debugLog('WebSocket', 'Connection error', {
+                error: event instanceof Error ? event.message : 'Unknown error',
+                readyState: socket.readyState,
+                attempt: connectionAttempts
+            });
             setStatus('Error');
         });
 
+        // Cleanup function
         return () => {
+            debugLog('WebSocket', 'Cleaning up connection', {
+                readyState: socket.readyState,
+                lastMessageReceived: lastMessageTime?.toISOString()
+            });
             socket.close();
         };
-    }, [setApp]);
+    }, [setApp, connectionAttempts, lastMessageTime]);
 
     const handleCheckboxChange = (id: number, isChecked: boolean) => {
+        debugLog('UserAction', 'Checkbox state changed', {
+            scrapeId: id,
+            newState: isChecked
+        });
+
         setApp(prevState => {
             const activeScrapes = prevState.activeScrapes || [];
 
             if (isChecked) {
-                // Add to activeScrapes if not already present
                 if (!activeScrapes.includes(id)) {
+                    debugLog('AppState', 'Adding scrape to active list', {
+                        scrapeId: id,
+                        currentActiveCount: activeScrapes.length
+                    });
                     return {
                         ...prevState,
                         activeScrapes: [...activeScrapes, id]
                     };
                 }
             } else {
-                // Remove from activeScrapes
+                debugLog('AppState', 'Removing scrape from active list', {
+                    scrapeId: id,
+                    currentActiveCount: activeScrapes.length
+                });
                 return {
                     ...prevState,
                     activeScrapes: activeScrapes.filter(scrapeId => scrapeId !== id)
@@ -113,7 +183,9 @@ export default function WebSocketListener() {
                 <h2 className="text-xl font-semibold">Artist Responses</h2>
                 <div className="flex items-center space-x-2">
                     <div className={`h-2 w-2 rounded-full ${status === 'Connected' ? 'bg-green-500' : 'bg-red-500'}`}></div>
-                    <span className="text-sm text-gray-500">Status: {status}</span>
+                    <span className="text-sm text-gray-500">
+                        Status: {status} {connectionAttempts > 1 ? `(Attempt: ${connectionAttempts})` : ''}
+                    </span>
                 </div>
             </div>
 
