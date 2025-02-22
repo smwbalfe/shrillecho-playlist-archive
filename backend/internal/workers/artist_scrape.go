@@ -103,18 +103,20 @@ func (scrp *ArtistScrapeWorker) ProcessResponeQueue(queueCtx context.Context) {
 			fmt.Printf("received response: %v", len(scrapeJob.Artists))
 
 			var wg sync.WaitGroup
+			semaphore := make(chan struct{}, 100) 
 
 			for _, artist := range scrapeJob.Artists {
 				wg.Add(1)
 				currentArtist := artist
 				
+				semaphore <- struct{}{} 
 				go func() {
 					defer wg.Done()
+					defer func() { <-semaphore }()
 					artistID, _ := scrp.artistRepo.CreateArtist(queueCtx, currentArtist.ID)
 					scrp.scrapeRepo.CreateScrapeArtist(queueCtx, scrapeJob.ID, artistID)
 				}()
 			}
-
 			wg.Wait()
 
 			if scrp.wsConn != nil {
