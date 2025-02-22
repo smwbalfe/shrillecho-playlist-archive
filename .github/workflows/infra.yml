@@ -110,20 +110,18 @@ jobs:
               cat ~/.ssh/github_id_rsa.pub
             fi
 
-      
-            cat > .env.prod << EOL
-            DATABASE_URL=${{ secrets.DATABASE_URL }}
-            REDIS_URL=${{ secrets.REDIS_URL }}
-            JWT_SECRET=${{ secrets.JWT_SECRET }}
-            SPOTIFY_CLIENT_ID=${{ secrets.SPOTIFY_CLIENT_ID }}
-            SPOTIFY_CLIENT_SECRET=${{ secrets.SPOTIFY_CLIENT_SECRET }}
-            NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET }}
-            NEXTAUTH_URL=${{ secrets.NEXTAUTH_URL }}
-            EOL
-            
             ssh-keyscan -H github.com >> ~/.ssh/known_hosts
             rm -rf shrillecho-playlist-archive
             git clone git@github.com:smwbalfe/shrillecho-playlist-archive.git
             cd shrillecho-playlist-archive/infra
+
+            cat > .env.prod << 'EOF'
+            REDIS_URL=${{ vars.REDIS_URL }}
+            GO_PORT=${{ vars.GO_PORT }}
+            POSTGRES_URL=${{ secrets.POSTGRES_URL }}
+            SUPABASE_JWT_SECRET=${{ secrets.SUPABASE_JWT_SECRET }}
+            SUPABASE_DB_PASSWORD=${{ secrets.SUPABASE_DB_PASSWORD }}
+            EOF
+
             docker-compose -f docker-compose.prod.yml down
             docker-compose -f docker-compose.prod.yml up
