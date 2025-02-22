@@ -133,6 +133,14 @@ jobs:
             git clone git@github.com:smwbalfe/shrillecho-playlist-archive.git
             cd shrillecho-playlist-archive/infra
 
+            mkdir -p ./nginx/etc/letsencrypt/live/shrillecho.app
+
+            echo ${{ secrets.PRIVKEY_PEM }} > ./nginx/etc/letsencrypt/live/shrillecho.com/privkey1.pem
+            echo ${{ secrets.FULLCHAIN_PEM }} > ./nginx/etc/letsencrypt/live/shrillecho.com/fullchain1.pem
+
+            chmod 600 ./nginx/etc/letsencrypt/live/shrillecho.com/privkey1.pem
+            chmod 600 ./nginx/etc/letsencrypt/live/shrillecho.com/fullchain1.pem
+
             cat > .env.prod << 'EOF'
             REDIS_URL=${{ vars.REDIS_URL }}
             GO_PORT=${{ vars.GO_PORT }}
@@ -142,7 +150,7 @@ jobs:
             EOF
 
             sudo systemctl docker start
-            
+
             echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u smwbalfe --password-stdin
 
             docker-compose -f docker-compose.prod.yml down
