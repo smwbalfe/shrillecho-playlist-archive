@@ -34,6 +34,7 @@ jobs:
         env:
           NEXT_PUBLIC_SUPABASE_URL: ${{ vars.NEXT_PUBLIC_SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          NEXT_PUBLIC_WEBSOCKET_API: ${{ vars.NEXT_PUBLIC_WEBSOCKET_API }}
         run: yarn build
       
       - name: Login to GitHub Container Registry
@@ -48,6 +49,7 @@ jobs:
         env:
           NEXT_PUBLIC_SUPABASE_URL: ${{ vars.NEXT_PUBLIC_SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          NEXT_PUBLIC_WEBSOCKET_API: ${{ vars.NEXT_PUBLIC_WEBSOCKET_API }}
         with:
           context: ./frontend
           push: true
