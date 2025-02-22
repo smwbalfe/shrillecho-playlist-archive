@@ -1,7 +1,7 @@
 version: '3.8'
 services:
   backend:
-    image: shrillecho-playlist-archive/backend:latest
+    image: smwbalfe/shrillecho-playlist-archive/backend:latest
     expose:
       - "8000"
     ports:
@@ -12,7 +12,7 @@ services:
       - redis
 
   frontend:
-    image: shrillecho-playlist-archive/frontend:latest
+    image: smwbalfe/shrillecho-playlist-archive/frontend:latest
     expose: 
       - "3000"
     ports: 
