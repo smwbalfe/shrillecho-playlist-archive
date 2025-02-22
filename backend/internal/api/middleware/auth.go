@@ -48,6 +48,7 @@ func CheckAuth(next http.Handler) http.Handler {
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 				return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 			}
+			fmt.Println(os.Getenv("SUPABASE_JWT_SECRET"))
 			secret := []byte(os.Getenv("SUPABASE_JWT_SECRET"))
 			return secret, nil
 		})

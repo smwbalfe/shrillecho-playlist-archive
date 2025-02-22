@@ -1,24 +1,27 @@
 package workers
 
 import (
-	"context"
-	"fmt"
-	"log"
-	"time"
-
-	client "gitlab.com/smwbalfe/spotify-client"
-
 	"backend/internal/config"
 	"backend/internal/repository"
 	"backend/internal/services"
+	"backend/internal/transport"
+	"context"
+	"fmt"
+	"log"
+	"sync"
+
+	"github.com/gorilla/websocket"
+	client "gitlab.com/smwbalfe/spotify-client"
 )
 
 type ArtistScrapeWorker struct {
 	Spotify    *client.SpotifyClient
 	Scraper    *service.ArtistScraperService
-	Queue      service.Queue
+	Queue      *service.RedisQueue
 	artistRepo repository.PostgresArtistRepository
 	scrapeRepo repository.PostgresScrapeRepository
+	wsConn *websocket.Conn
+    wsMutex sync.Mutex
 }
 
 func NewArtistScrapeWorker(sharedCfg *config.SharedConfig) ArtistScrapeWorker {
@@ -36,46 +39,85 @@ func NewArtistScrapeWorker(sharedCfg *config.SharedConfig) ArtistScrapeWorker {
 	}
 }
 
+func (w *ArtistScrapeWorker) SetWebsocketConnection(conn *websocket.Conn) {
+    w.wsMutex.Lock()
+    defer w.wsMutex.Unlock()
+    w.wsConn = conn
+}
+
 func (scrp *ArtistScrapeWorker) ProcessScrapeQueue(queueCtx context.Context) {
 	for {
 		select {
 		case <-queueCtx.Done():
 			return
 		default:
-			job, err := scrp.Queue.Dequeue(queueCtx)
-			fmt.Printf("dequeue: %v\n", job.ID)
+			
+			var scrapeJob service.ScrapeJob
+
+			err := scrp.Queue.PopRequest(queueCtx, &scrapeJob)
+
 			if err != nil {
 				log.Printf("Error dequeuing job: %v", err)
-				time.Sleep(time.Second)
-				continue
+				scrapeJob.Status = "failure"
+				scrapeJob.Error = err.Error()
+				scrp.Queue.PushResponse(queueCtx, &scrapeJob)
 			}
-			job.Status = "processing"
-			scrp.Queue.UpdateJob(queueCtx, job)
-			artists, err := scrp.Scraper.TriggerArtistScrape(queueCtx, job.ScrapeID, job.Artist, job.Depth)
+
+			artists, err := scrp.Scraper.TriggerArtistScrape(
+				queueCtx, 
+				scrapeJob.ScrapeID, 
+				scrapeJob.Artist, 
+				scrapeJob.Depth,
+			)
+
 			if err != nil {
-				job.Status = "failed"
-				job.Error = err.Error()
-				scrp.Queue.UpdateJob(queueCtx, job)
-				continue
+				log.Printf("error scraping: %v", err)
+				scrapeJob.Status = "failure"
+				scrapeJob.Error = err.Error()
+				scrp.Queue.PushResponse(queueCtx, &scrapeJob)
 			}
 
-			for _, artist := range artists {
-				artistID, err := scrp.artistRepo.CreateArtist(queueCtx, artist.ID)
-				if err != nil {
-					log.Fatalf("postgres error: %v", err.Error())
-					continue
-				}
+			scrapeJob.Status = "success"
+			scrapeJob.Artists = artists
+			scrp.Queue.PushResponse(queueCtx, &scrapeJob)
+		}
+	}
+}
 
-				err = scrp.scrapeRepo.CreateScrapeArtist(queueCtx, job.ScrapeID, artistID)
+func (scrp *ArtistScrapeWorker) ProcessResponeQueue(queueCtx context.Context) {
+	for {
+		select {
+		case <-queueCtx.Done():
+			return
+		default:
+			
+			var scrapeJob service.ScrapeJob
 
-				if err != nil {
-					log.Fatalf("postgres error: %v", err.Error())
-					continue
-				}
+			err := scrp.Queue.PopResponse(queueCtx, &scrapeJob)
+			if err != nil {
+				fmt.Printf("invalid response received: %v", err)
+				fmt.Println(scrapeJob)
 			}
-			job.Status = "completed"
-			job.Artists = artists
-			scrp.Queue.UpdateJob(queueCtx, job)
+
+			fmt.Printf("received response: %v", len(scrapeJob.Artists))
+
+			for _, artist := range scrapeJob.Artists {
+				fmt.Println(artist.Profile.Name)
+			}
+
+			if scrp.wsConn != nil {
+				
+				wsResponse := transport.ArtistWsResponse {
+					ID: int(scrapeJob.ID),
+					Depth: scrapeJob.Depth,
+					SeedArtist: scrapeJob.Artist,
+					TotalArtists: len(scrapeJob.Artists) ,
+				}
+
+				scrp.wsConn.WriteJSON(wsResponse)
+			} else {
+				panic("no websocket")
+			}
 		}
 	}
 }

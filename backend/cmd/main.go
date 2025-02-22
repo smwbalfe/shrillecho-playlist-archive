@@ -49,9 +49,10 @@ func InitializeDatabases(env *config.Environment) (*config.DatabaseConnections, 
 	if err != nil {
 		panic("failed to reset redis")
 	}
-	pgConnString := fmt.Sprintf("host=%v user=%v password=%v dbname=%v",  env.PostgresHost, os.Getenv("POSTGRES_USER"), 
-	os.Getenv("POSTGRES_PASSWORD"), os.Getenv("POSTGRES_DB"))
-	conn, err := pgx.Connect(context.Background(), pgConnString)
+
+	pgConn := "postgresql://postgres.dbhaywqsvpnivdzodkwg:H2sxfCRlRpPUYX18@aws-0-eu-west-2.pooler.supabase.com:5432/postgres?preferSimpleProtocol=True"
+
+	conn, err := pgx.Connect(context.Background(), pgConn)
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialize postgres: %w", err)
 	}
@@ -67,6 +68,7 @@ func main() {
 	ctx := context.Background()
 
 	apiCfg := config.LoadEnv()
+	fmt.Println(apiCfg)
 
 	dbs, err := InitializeDatabases(&apiCfg)
 	if err != nil {
@@ -88,12 +90,16 @@ func main() {
 
 	artistScraperWorker := workers.NewArtistScrapeWorker(sharedCfg)
 
+	api.SetScrapeWorker(&artistScraperWorker)
+
 	queueCtx, cancel := context.WithCancel(ctx)
 	defer cancel()
-	numWorkers := 5
-	for i := 0; i < numWorkers; i++ {
-		go artistScraperWorker.ProcessScrapeQueue(queueCtx)
-	}
+	// numWorkers := 5
+	// for i := 0; i < numWorkers; i++ {
+	// 	go artistScraperWorker.ProcessScrapeQueue(queueCtx)
+	// }
+
+	go artistScraperWorker.ProcessResponeQueue(queueCtx)
 
 	log.Printf("Starting server on port: %v", os.Getenv("PORT"))
 	fmt.Println(apiCfg.ServerHost, apiCfg.ServerPort)

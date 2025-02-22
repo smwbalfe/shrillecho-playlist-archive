@@ -69,7 +69,7 @@ export const ArtistGrid: FC = () => {
                 </button>
             </div>
 
-            {artistData.length === 0 ? (
+            {/* {artistData.length === 0 ? (
                 <div className="text-center text-gray-500 py-8">
                     No artists found
                 </div>
@@ -108,7 +108,7 @@ export const ArtistGrid: FC = () => {
                         })}
                     </div>
                 </div>
-            )}
+            )} */}
         </div>
     )
 }

@@ -89,12 +89,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Write hello world to remote
-        env:
-          HOST: ${{ needs.terraform.outputs.droplet_ip }}
-          USER: root
-          KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-        run: |
-          echo "$KEY" > private_key
-          chmod 600 private_key
-          echo "Hello World!" | ssh -i private_key -o StrictHostKeyChecking=no $USER@$HOST 'cat > ~/hello.txt'
-          rm private_key
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ needs.terraform.outputs.droplet_ip }}
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            echo "Hello World!" > ~/hello.txt

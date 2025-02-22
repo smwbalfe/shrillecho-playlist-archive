@@ -1,9 +1,18 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
+export interface ScrapeResponse {
+    id: number;
+    total_artists: number;
+    seed_artist: string;
+    depth: number;
+}
+
 interface AppState {
     playlists: string[]
     genres: string[]
     selectedGenres: string[]
+    scrapes: ScrapeResponse[]
+    activeScrapes: number[]
 }
 
 interface AppContextType {
@@ -29,7 +38,9 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     const [app, setApp] = useState<AppState>({
        playlists: [],
        genres: [],
-       selectedGenres: []
+       selectedGenres: [],
+       scrapes: [],
+       activeScrapes: []
     });
 
     return (

@@ -14,6 +14,7 @@ type ScrapeJob struct {
 	Status   string        `json:"status"`
 	Error    string        `json:"error,omitempty"`
 	Artists  []data.Artist `json:"artists,omitempty"`
+	TotalArtists int `json:"total_artists"`
 }
 
 type Queue interface {

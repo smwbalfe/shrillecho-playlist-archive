@@ -5,26 +5,15 @@ import { ArtistGrid } from '@/src/lib/components/main/artist-grid'
 import { PlaylistGrid } from '@/src/lib/components/main/playlist-grid'
 import { LoadedPlaylists } from '@/src/lib/components/main/loaded-playlists'
 import { AppProvider } from '../context/app-state'
+import Welcome from '../components/main/login'
+import WebSocketListener from '../services/websocket'
 
 export const Index = (): JSX.Element => {
     const { isLoading, hasSession, registerAnomUser } = useAuth()
     const [showArtists, setShowArtists] = useState(true)
 
     if (!hasSession) {
-        return (
-            <div className="flex min-h-screen items-center justify-center bg-gray-50">
-                <div className="text-center">
-                    <h1 className="mb-6 text-3xl font-bold text-gray-900">Welcome to Playlist Miner</h1>
-                    <button
-                        onClick={registerAnomUser}
-                        disabled={isLoading}
-                        className="rounded-lg bg-blue-600 px-6 py-3 text-white shadow-lg hover:bg-blue-700 disabled:bg-blue-400"
-                    >
-                        {isLoading ? 'Processing...' : 'Create Anonymous Account'}
-                    </button>
-                </div>
-            </div>
-        )
+        return <Welcome isLoading={isLoading} registerAnomUser={registerAnomUser} />
     }
 
     return (
@@ -52,7 +41,12 @@ export const Index = (): JSX.Element => {
                             <LoadedPlaylists />
                         </aside>
                         <div>
-                            {showArtists ? <ArtistGrid /> : <PlaylistGrid />}
+                            <div>
+                                {showArtists ? <ArtistGrid /> : <PlaylistGrid />}
+                            </div>
+                            <div>
+                                <WebSocketListener />
+                            </div>
                         </div>
                     </div>
                 </main>

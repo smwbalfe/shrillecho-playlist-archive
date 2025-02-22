@@ -10,3 +10,7 @@ type ScrapeRequest struct {
 type ScrapeResponse struct {
 	Artists []data.Artist `json:"artists"`
 }
+
+type ScrapeTriggerResponse struct {
+	ScrapeID int64 `json:"id"`
+}

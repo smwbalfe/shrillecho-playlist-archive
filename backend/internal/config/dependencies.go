@@ -17,7 +17,7 @@ type DatabaseConnections struct {
 
 type AppServices struct {
 	ScrapeRepo repository.PostgresScrapeRepository
-	Queue      service.Queue
+	Queue      *service.RedisQueue
 	Spotify    *client.SpotifyClient
 }
 
