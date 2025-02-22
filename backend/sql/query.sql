@@ -36,3 +36,17 @@ JOIN scrape_artists sa ON sa.artist_id = a.id
 JOIN scrapes s ON s.id = sa.scrape_id
 WHERE s.user_id = $1
 ORDER BY a.artist_id;
+
+-- name: GetUserByID :one
+SELECT EXISTS (
+    SELECT 1 
+    FROM users 
+    WHERE id = $1
+);
+
+-- name: GetScrapeByID :one
+SELECT EXISTS (
+    SELECT 1 
+    FROM scrapes 
+    WHERE id = $1
+);

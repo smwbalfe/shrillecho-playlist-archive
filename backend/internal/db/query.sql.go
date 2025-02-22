@@ -102,6 +102,21 @@ func (q *Queries) GetScrapeArtists(ctx context.Context, scrapeID int64) ([]Artis
 	return items, nil
 }
 
+const getScrapeByID = `-- name: GetScrapeByID :one
+SELECT EXISTS (
+    SELECT 1 
+    FROM scrapes 
+    WHERE id = $1
+)
+`
+
+func (q *Queries) GetScrapeByID(ctx context.Context, id int64) (bool, error) {
+	row := q.db.QueryRow(ctx, getScrapeByID, id)
+	var exists bool
+	err := row.Scan(&exists)
+	return exists, err
+}
+
 const getUserArtists = `-- name: GetUserArtists :many
 SELECT DISTINCT 
     a.artist_id
@@ -130,4 +145,19 @@ func (q *Queries) GetUserArtists(ctx context.Context, userID pgtype.UUID) ([]str
 		return nil, err
 	}
 	return items, nil
+}
+
+const getUserByID = `-- name: GetUserByID :one
+SELECT EXISTS (
+    SELECT 1 
+    FROM users 
+    WHERE id = $1
+)
+`
+
+func (q *Queries) GetUserByID(ctx context.Context, id pgtype.UUID) (bool, error) {
+	row := q.db.QueryRow(ctx, getUserByID, id)
+	var exists bool
+	err := row.Scan(&exists)
+	return exists, err
 }

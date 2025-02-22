@@ -1,49 +1,88 @@
 package config
 
 import (
-	"fmt"
 	"os"
+	"strings"
 )
 
+type PostgresConfig struct {
+	PostgresHost     string
+	PostgresPassword string
+	PostgresDomain   string
+	PostgresDb       string
+	PostgresUser     string
+}
+
+type RedisConfig struct {
+	RedisHost string
+	RedisPort string
+}
+
+type ServerConfig struct {
+	ServerHost string
+	ServerPort string
+}
+
 type Environment struct {
-	RedisHost      string
-	RedisPort      string
-	PostgresHost   string
-	AllowedOrigins []string
-	ServerHost     string
-	ServerPort     string
+	PostgresConfig
+	RedisConfig
+	ServerConfig
+	AllowedOrigins    []string
+	SupabaseJwtSecret string
 }
 
 func LoadEnv() Environment {
-	env := os.Getenv("ENV")
-	isProd := env == "prod"
-	fmt.Printf("server running: %v\n", env)
-	if isProd {
-		return Environment{
-			RedisHost:      "redis",
-			RedisPort:      "6379",
-			PostgresHost:   "db",
-			AllowedOrigins: [] string{"https://shrillecho.app"},
-			ServerHost:     "",
-			ServerPort:     "8000",
-		}
+	postgresHost := os.Getenv("POSTGRES_HOST")
+	postgresPassword := os.Getenv("POSTGRES_PASSWORD")
+	postgresDomain := os.Getenv("POSTGRES_DOMAIN")
+	postgresDb := os.Getenv("POSTGRES_DB")
+	postgresUser := os.Getenv("POSTGRES_USER")
+
+	redisHost := os.Getenv("REDIS_HOST")
+	redisPort := os.Getenv("REDIS_PORT")
+
+	serverHost := os.Getenv("GO_HOST")
+	serverPort := os.Getenv("GO_PORT")
+
+	supabaseJwtSecret := os.Getenv("SUPABASE_JWT_SECRET")
+	allowedOrigins := os.Getenv("ALLOWED_ORIGINS")
+
+	if postgresHost == "" || postgresPassword == "" || postgresDb == "" || postgresUser == "" {
+
+		panic("Missing required PostgreSQL environment variables")
+	}
+	if redisHost == "" || redisPort == "" {
+		panic("Missing required Redis environment variables")
+	}
+	if serverHost == "" || serverPort == "" {
+		panic("Missing required server environment variables")
+	}
+	if supabaseJwtSecret == "" {
+		panic("Missing required Supabase JWT secret")
+	}
+
+	var origins []string
+	if allowedOrigins != "" {
+		origins = strings.Split(allowedOrigins, ",")
 	}
 
 	return Environment{
-			RedisHost:      "redis",
-			RedisPort:      "6379",
-			PostgresHost:   "db",
-			AllowedOrigins: [] string{"https://shrillecho.app"},
-			ServerHost:     "",
-			ServerPort:     "8000",
-		}
-
-	// return Environment{
-	// 	RedisHost:      "104.248.163.15",
-	// 	RedisPort:      "6379",
-	// 	PostgresHost:   "aws-0-eu-west-2.pooler.supabase.com:6543",
-	// 	AllowedOrigins: [] string{"http://localhost:3000", "http://localhost:3000/"},
-	// 	ServerHost:     "localhost",
-	// 	ServerPort:     "8000",
-	// }
+		PostgresConfig: PostgresConfig{
+			PostgresHost:     postgresHost,
+			PostgresPassword: postgresPassword,
+			PostgresDomain:   postgresDomain,
+			PostgresDb:       postgresDb,
+			PostgresUser:     postgresUser,
+		},
+		RedisConfig: RedisConfig{
+			RedisHost: redisHost,
+			RedisPort: redisPort,
+		},
+		ServerConfig: ServerConfig{
+			ServerHost: serverHost,
+			ServerPort: serverPort,
+		},
+		SupabaseJwtSecret: supabaseJwtSecret,
+		AllowedOrigins:    origins,
+	}
 }

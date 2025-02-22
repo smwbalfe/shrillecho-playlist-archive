@@ -65,7 +65,7 @@ func (scrp *ArtistScrapeWorker) ProcessScrapeQueue(queueCtx context.Context) {
 
 			artists, err := scrp.Scraper.TriggerArtistScrape(
 				queueCtx, 
-				scrapeJob.ScrapeID, 
+				scrapeJob.ID, 
 				scrapeJob.Artist, 
 				scrapeJob.Depth,
 			)
@@ -94,6 +94,7 @@ func (scrp *ArtistScrapeWorker) ProcessResponeQueue(queueCtx context.Context) {
 			var scrapeJob service.ScrapeJob
 
 			err := scrp.Queue.PopResponse(queueCtx, &scrapeJob)
+
 			if err != nil {
 				fmt.Printf("invalid response received: %v", err)
 				fmt.Println(scrapeJob)
@@ -101,9 +102,20 @@ func (scrp *ArtistScrapeWorker) ProcessResponeQueue(queueCtx context.Context) {
 
 			fmt.Printf("received response: %v", len(scrapeJob.Artists))
 
+			var wg sync.WaitGroup
+
 			for _, artist := range scrapeJob.Artists {
-				fmt.Println(artist.Profile.Name)
+				wg.Add(1)
+				currentArtist := artist
+				
+				go func() {
+					defer wg.Done()
+					artistID, _ := scrp.artistRepo.CreateArtist(queueCtx, currentArtist.ID)
+					scrp.scrapeRepo.CreateScrapeArtist(queueCtx, scrapeJob.ID, artistID)
+				}()
 			}
+
+			wg.Wait()
 
 			if scrp.wsConn != nil {
 				

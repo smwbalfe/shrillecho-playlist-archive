@@ -8,7 +8,6 @@ import (
 
 type ScrapeJob struct {
 	ID       int64         `json:"id"`
-	ScrapeID int64         `json:"scrape_id"`
 	Artist   string        `json:"artist"`
 	Depth    int           `json:"depth"`
 	Status   string        `json:"status"`

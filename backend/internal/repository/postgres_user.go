@@ -24,3 +24,11 @@ func (r *PostgresUserRepository) GetUserArtists(ctx context.Context, userID uuid
 func (r *PostgresUserRepository) CreateUser(ctx context.Context, userID uuid.UUID) (pgtype.UUID, error) {
 	return r.postgres.CreateUser(ctx, pgtype.UUID{Bytes: userID, Valid: true})
 }
+
+func (r *PostgresUserRepository) GetUserByID(ctx context.Context, userID uuid.UUID) (bool, error) {
+    exists, err := r.postgres.GetUserByID(ctx, pgtype.UUID{Bytes: userID, Valid: true})
+    if err != nil {
+        return false, err
+    }
+    return exists, nil
+}

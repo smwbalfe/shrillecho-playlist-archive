@@ -1,9 +1,12 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL
-    || (process.env.NEXT_PUBLIC_NODE_ENV === 'dev'
-        ? 'http://localhost:8000' 
-        : 'https://shrillecho.app/api')
+import env from '@/src/lib/config/env'
 
-console.log(process.env.NEXT_PUBLIC_NODE_ENV)
+// const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL
+//     || (process.env.NEXT_PUBLIC_NODE_ENV === 'dev'
+//         ? 'http://localhost:8000' 
+//         : 'https://shrillecho.app/api')
+
+const API_BASE_URL = env.NEXT_PUBLIC_GO_API
+
 export const api = {
     get: async (endpoint: string) => {
         const response = await fetch(`${API_BASE_URL}${endpoint}`, {

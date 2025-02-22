@@ -22,7 +22,6 @@ export default function WebSocketListener() {
 
     useEffect(() => {
         if (!app.activeScrapes) {
-            // Initialize activeScrapes if it doesn't exist
             setApp(prevState => ({
                 ...prevState,
                 activeScrapes: []
@@ -31,7 +30,7 @@ export default function WebSocketListener() {
     }, [app, setApp]);
 
     useEffect(() => {
-        const socket = new WebSocket('wss://shrillecho.app/ws');
+        const socket = new WebSocket('ws://localhost:8000/ws');
 
         socket.addEventListener('open', (event) => {
             console.log('Connected to WebSocket server');
