@@ -12,6 +12,8 @@ import {
 import { Button } from '@/src/lib/components/ui/button';
 import { Checkbox } from '@/src/lib/components/ui/checkbox';
 
+import env from '../config/env';
+
 export default function WebSocketListener() {
     const [status, setStatus] = useState('Disconnected');
     const { app, setApp } = useApp();
@@ -30,7 +32,7 @@ export default function WebSocketListener() {
     }, [app, setApp]);
 
     useEffect(() => {
-        const socket = new WebSocket('ws://localhost:8000/ws');
+        const socket = new WebSocket(env.NEXT_PUBLIC_WEBSOCKET_API);
 
         socket.addEventListener('open', (event) => {
             console.log('Connected to WebSocket server');
