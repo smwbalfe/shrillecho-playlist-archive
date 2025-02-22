@@ -133,7 +133,7 @@ jobs:
             git clone git@github.com:smwbalfe/shrillecho-playlist-archive.git
             cd shrillecho-playlist-archive/infra
 
-            cat > .env.prod << EOF
+            cat > .env.prod << 'EOF'
             REDIS_URL=${{ vars.REDIS_URL }}
             GO_PORT=${{ vars.GO_PORT }}
             POSTGRES_URL=${{ secrets.POSTGRES_URL }}
