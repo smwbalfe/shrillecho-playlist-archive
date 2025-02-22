@@ -29,7 +29,7 @@ const env: Env = {
     NEXT_PUBLIC_WEBSOCKET_API: process.env.NEXT_PUBLIC_WEBSOCKET_API || ''
 };
 
-// Validate environment variables before exporting
+// Validate environment variables before exportings
 validateEnv(env);
 
 console.log('Environment variables loaded successfully:', env);
