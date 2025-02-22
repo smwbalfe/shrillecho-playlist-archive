@@ -104,6 +104,6 @@ jobs:
               cat ~/.ssh/github_id_rsa.pub
             fi
             ssh-keyscan -H github.com >> ~/.ssh/known_hosts
-            git clone git@github.com:your-username/your-repo.git
-            cd your-repo
+            git clone git@github.com:smwbalfe/shrillecho-playlist-archive.git
+            cd shrillecho-playlist-archive
             docker-compose down
