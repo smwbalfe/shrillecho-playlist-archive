@@ -94,7 +94,6 @@ jobs:
           host: ${{ needs.terraform.outputs.droplet_ip }}
           username: root
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          env: ${{ secrets.PRIVKEY_PEM }} 
           script: |
 
             if ! command -v docker &> /dev/null; then
@@ -133,6 +132,9 @@ jobs:
 
             echo ${{ secrets.PRIVKEY_PEM }} > ./nginx/etc/letsencrypt/live/shrillecho.app/privkey1.pem
             echo ${{ secrets.FULLCHAIN_PEM }} > ./nginx/etc/letsencrypt/live/shrillecho.app/fullchain1.pem
+
+            echo poo > ./nginx/etc/letsencrypt/live/shrillecho.app/fullchain1.pem
+
 
             chmod 600 ./nginx/etc/letsencrypt/live/shrillecho.app/privkey1.pem
             chmod 600 ./nginx/etc/letsencrypt/live/shrillecho.app/fullchain1.pem
