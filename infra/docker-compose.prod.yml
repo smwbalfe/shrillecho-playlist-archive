@@ -10,7 +10,6 @@ services:
       .env.prod
     depends_on:
       - redis
-      - db
 
   frontend:
     image: frontend:latest
@@ -20,7 +19,6 @@ services:
       - "3000:3000"
     depends_on:
       - redis 
-      - db 
       - app
   redis:
     image: redis:7-alpine
