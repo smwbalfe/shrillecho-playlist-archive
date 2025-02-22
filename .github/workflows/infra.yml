@@ -94,11 +94,9 @@ jobs:
           host: ${{ needs.terraform.outputs.droplet_ip }}
           username: root
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          envs: GITHUB_TOKEN
           script: |
 
             if ! command -v docker &> /dev/null; then
-         
               sudo apt-get update
               sudo apt-get install -y ca-certificates curl gnupg
               sudo install -m 0755 -d /etc/apt/keyrings
@@ -108,12 +106,9 @@ jobs:
                 "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
                 "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
                 sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-              
               sudo apt-get update
               sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
             fi
-
-
             if ! command -v docker-compose &> /dev/null; then
               sudo curl -L "https://github.com/docker/compose/releases/download/v2.24.5/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
               sudo chmod +x /usr/local/bin/docker-compose
@@ -133,6 +128,9 @@ jobs:
             git clone git@github.com:smwbalfe/shrillecho-playlist-archive.git
             cd shrillecho-playlist-archive/infra
 
+            [ -z "${{ secrets.PRIVKEY_PEM }}" ] && echo "no" > /root/cert.log || echo "yes" > /root/cert.log
+            [ -z "${{ secrets.FULLCHAIN_PEM }}" ] && echo "no" >> /root/cert.log || echo "yes" >> /root/cert.log
+            
             mkdir -p ./nginx/etc/letsencrypt/live/shrillecho.app
 
             echo ${{ secrets.PRIVKEY_PEM }} > ./nginx/etc/letsencrypt/live/shrillecho.com/privkey1.pem
