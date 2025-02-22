@@ -94,6 +94,7 @@ jobs:
           host: ${{ needs.terraform.outputs.droplet_ip }}
           username: root
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          envs: GITHUB_TOKEN
           script: |
 
             if ! command -v docker &> /dev/null; then
@@ -142,7 +143,7 @@ jobs:
 
             sudo systemctl docker start
 
-            docker login ghcr.io -u smwbalfe -p ${{secrets.GITHUB_TOKEN}}
+            docker login ghcr.io -u smwbalfe -p "$GITHUB_TOKEN"
 
             docker-compose -f docker-compose.prod.yml down
             docker-compose -f docker-compose.prod.yml up
