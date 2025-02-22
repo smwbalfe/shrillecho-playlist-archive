@@ -23,14 +23,11 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'pnpm'
-          cache-dependency-path: './frontend/pnpm-lock.yaml'
-
-      - name: Install pnpm
-        run: npm install -g pnpm
+          cache: 'npm'
+          cache-dependency-path: './frontend/package-lock.json'
 
       - name: Install dependencies
-        run: pnpm install
+        run: npm install
 
       - name: Build
-        run: pnpm run build
+        run: npm run build
