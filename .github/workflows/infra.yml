@@ -202,5 +202,5 @@ jobs:
             cd shrillecho-playlist-archive/infra
             sudo systemctl docker start
             echo "$GITHUB_TOKEN" | docker login ghcr.io -u smwbalfe --password-stdin
-            docker-compose -f docker-compose.prod.yml down
-            docker-compose -f docker-compose.prod.yml up -d
+            docker-compose -f docker-compose.yml down
+            docker-compose -f docker-compose.yml up -d
