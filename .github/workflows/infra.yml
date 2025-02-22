@@ -88,14 +88,13 @@ jobs:
     environment: shrillecho
     runs-on: ubuntu-latest
     steps:
-      - name: Setup VPS GitHub access
+      - name: Install Docker
         uses: appleboy/ssh-action@master
         with:
           host: ${{ needs.terraform.outputs.droplet_ip }}
           username: root
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-
             if ! command -v docker &> /dev/null; then
               sudo apt-get update
               sudo apt-get install -y ca-certificates curl gnupg
@@ -109,49 +108,99 @@ jobs:
               sudo apt-get update
               sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
             fi
+
+      - name: Install Docker Compose
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ needs.terraform.outputs.droplet_ip }}
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
             if ! command -v docker-compose &> /dev/null; then
               sudo curl -L "https://github.com/docker/compose/releases/download/v2.24.5/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
               sudo chmod +x /usr/local/bin/docker-compose
             fi
 
+      - name: Setup GitHub SSH Access
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ needs.terraform.outputs.droplet_ip }}
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
             if [ ! -f ~/.ssh/github_id_rsa ]; then
               mkdir -p ~/.ssh
               ssh-keygen -t rsa -b 4096 -f ~/.ssh/github_id_rsa -N ""
               echo "Host github.com" >> ~/.ssh/config
               echo "  IdentityFile ~/.ssh/github_id_rsa" >> ~/.ssh/config
               echo "  StrictHostKeyChecking no" >> ~/.ssh/config
-              cat ~/.ssh/github_id_rsa.pub
             fi
-
             ssh-keyscan -H github.com >> ~/.ssh/known_hosts
+
+      - name: Clone Repository
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ needs.terraform.outputs.droplet_ip }}
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
             rm -rf shrillecho-playlist-archive
             git clone git@github.com:smwbalfe/shrillecho-playlist-archive.git
             cd shrillecho-playlist-archive/infra
 
+      - name: Setup SSL Certificates
+        uses: appleboy/ssh-action@master
+        env:
+          PRIVKEY_PEM: ${{ secrets.PRIVKEY_PEM }}
+          FULLCHAIN_PEM: ${{ secrets.FULLCHAIN_PEM }}
+        with:
+          host: ${{ needs.terraform.outputs.droplet_ip }}
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          envs: PRIVKEY_PEM,FULLCHAIN_PEM
+          script: |
+            cd shrillecho-playlist-archive/infra
             mkdir -p ./nginx/letsencrypt/live/shrillecho.app
-
-            cat > ./nginx/letsencrypt/live/shrillecho.app/privkey1.pem << 'EOF'
-            ${{ secrets.PRIVKEY_PEM }}
-            EOF
-
-            cat > ./nginx/letsencrypt/live/shrillecho.app/fullchain1.pem << 'EOF'
-            ${{ secrets.FULLCHAIN_PEM }}
-            EOF
-
+            echo "$PRIVKEY_PEM" > ./nginx/letsencrypt/live/shrillecho.app/privkey1.pem
+            echo "$FULLCHAIN_PEM" > ./nginx/letsencrypt/live/shrillecho.app/fullchain1.pem
             chmod 600 ./nginx/letsencrypt/live/shrillecho.app/privkey1.pem
             chmod 600 ./nginx/letsencrypt/live/shrillecho.app/fullchain1.pem
 
-            cat > .env.prod << 'EOF'
-            REDIS_URL=${{ vars.REDIS_URL }}
-            GO_PORT=${{ vars.GO_PORT }}
-            POSTGRES_URL=${{ secrets.POSTGRES_URL }}
-            SUPABASE_JWT_SECRET=${{ secrets.SUPABASE_JWT_SECRET }}
-            SUPABASE_DB_PASSWORD=${{ secrets.SUPABASE_DB_PASSWORD }}
+      - name: Setup Environment Variables
+        uses: appleboy/ssh-action@master
+        env:
+          REDIS_URL: ${{ vars.REDIS_URL }}
+          GO_PORT: ${{ vars.GO_PORT }}
+          POSTGRES_URL: ${{ secrets.POSTGRES_URL }}
+          SUPABASE_JWT_SECRET: ${{ secrets.SUPABASE_JWT_SECRET }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        with:
+          host: ${{ needs.terraform.outputs.droplet_ip }}
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          envs: REDIS_URL,GO_PORT,POSTGRES_URL,SUPABASE_JWT_SECRET,SUPABASE_DB_PASSWORD
+          script: |
+            cd shrillecho-playlist-archive/infra
+            cat > .env.prod << EOF
+            REDIS_URL=$REDIS_URL
+            GO_PORT=$GO_PORT
+            POSTGRES_URL=$POSTGRES_URL
+            SUPABASE_JWT_SECRET=$SUPABASE_JWT_SECRET
+            SUPABASE_DB_PASSWORD=$SUPABASE_DB_PASSWORD
             EOF
 
+      - name: Deploy Application
+        uses: appleboy/ssh-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          host: ${{ needs.terraform.outputs.droplet_ip }}
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          envs: GITHUB_TOKEN
+          script: |
+            cd shrillecho-playlist-archive/infra
             sudo systemctl docker start
-
-            echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u smwbalfe --password-stdin
-
+            echo "$GITHUB_TOKEN" | docker login ghcr.io -u smwbalfe --password-stdin
             docker-compose -f docker-compose.prod.yml down
             docker-compose -f docker-compose.prod.yml up -d
