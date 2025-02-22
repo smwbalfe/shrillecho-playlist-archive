@@ -129,9 +129,7 @@ func (scrp *ArtistScrapeWorker) ProcessResponeQueue(queueCtx context.Context) {
 				}
 
 				scrp.wsConn.WriteJSON(wsResponse)
-			} else {
-				panic("no websocket")
-			}
+			} 
 		}
 	}
 }
