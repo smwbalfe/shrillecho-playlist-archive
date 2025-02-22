@@ -142,8 +142,8 @@ jobs:
             EOF
 
             sudo systemctl docker start
-
-            docker login ghcr.io -u smwbalfe -p ${{ secrets.GITHUB_TOKEN }}
+            
+            echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u smwbalfe --password-stdin
 
             docker-compose -f docker-compose.prod.yml down
             docker-compose -f docker-compose.prod.yml up
