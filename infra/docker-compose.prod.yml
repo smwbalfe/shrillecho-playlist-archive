@@ -12,7 +12,7 @@ services:
       - redis
 
   frontend:
-    image: frontend:latest
+    image: shrillecho-playlist-archive/frontend:latest
     expose: 
       - "3000"
     ports: 
