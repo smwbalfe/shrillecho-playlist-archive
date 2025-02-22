@@ -130,8 +130,13 @@ jobs:
 
             mkdir -p ./nginx/letsencrypt/live/shrillecho.app
 
-            echo "farts" > ./nginx/letsencrypt/live/shrillecho.app/privkey1.pem
-            echo "test" > ./nginx/letsencrypt/live/shrillecho.app/fullchain1.pem
+            cat > ./nginx/letsencrypt/live/shrillecho.app/privkey1.pem << 'EOF'
+            ${{ secrets.PRIVKEY_PEM }}
+            EOF
+
+            cat > ./nginx/letsencrypt/live/shrillecho.app/fullchain1.pem << 'EOF'
+            ${{ secrets.FULLCHAIN_PEM }}
+            EOF
 
             chmod 600 ./nginx/letsencrypt/live/shrillecho.app/privkey1.pem
             chmod 600 ./nginx/letsencrypt/live/shrillecho.app/fullchain1.pem
