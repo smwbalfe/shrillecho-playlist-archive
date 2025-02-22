@@ -34,7 +34,7 @@ export default function WebSocketListener() {
     useEffect(() => {
         const socket = new WebSocket(env.NEXT_PUBLIC_WEBSOCKET_API);
 
-        socket.addEventListener('opened', (event) => {
+        socket.addEventListener('open', (event) => {
             console.log('Connected to WebSocket server');
             setStatus('Connected');
         });
