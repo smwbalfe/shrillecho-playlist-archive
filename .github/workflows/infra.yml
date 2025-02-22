@@ -115,4 +115,5 @@ jobs:
             rm -rf shrillecho-playlist-archive
             git clone git@github.com:smwbalfe/shrillecho-playlist-archive.git
             cd shrillecho-playlist-archive/infra
-            docker-compose down
+            docker-compose -f docker-compose.prod.yml down
+            docker-compose -f docker-compose.prod.yml up
