@@ -35,4 +35,4 @@ require (
 	golang.org/x/text v0.21.0 // indirect
 )
 
-replace gitlab.com/smwbalfe/spotify-client => K:\core\DEV\PROJECTS\playlist-archive\go-spotify-client
+// replace gitlab.com/smwbalfe/spotify-client => K:\core\DEV\PROJECTS\playlist-archive\go-spotify-client
