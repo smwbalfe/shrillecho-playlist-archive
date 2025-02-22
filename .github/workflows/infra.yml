@@ -94,6 +94,7 @@ jobs:
           host: ${{ needs.terraform.outputs.droplet_ip }}
           username: root
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          env: ${{ secrets.PRIVKEY_PEM }} 
           script: |
 
             if ! command -v docker &> /dev/null; then
@@ -127,9 +128,6 @@ jobs:
             rm -rf shrillecho-playlist-archive
             git clone git@github.com:smwbalfe/shrillecho-playlist-archive.git
             cd shrillecho-playlist-archive/infra
-
-            [ -z "${{ secrets.PRIVKEY_PEM }}" ] && echo "no" > /root/cert.log || echo "yes" > /root/cert.log
-            [ -z "${{ secrets.FULLCHAIN_PEM }}" ] && echo "no" >> /root/cert.log || echo "yes" >> /root/cert.log
 
             mkdir -p ./nginx/etc/letsencrypt/live/shrillecho.app
 
