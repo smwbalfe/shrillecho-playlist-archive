@@ -31,7 +31,7 @@ export default function WebSocketListener() {
     }, [app, setApp]);
 
     useEffect(() => {
-        const socket = new WebSocket('ws://shrillecho.app/ws');
+        const socket = new WebSocket('wss://shrillecho.app/ws');
 
         socket.addEventListener('open', (event) => {
             console.log('Connected to WebSocket server');

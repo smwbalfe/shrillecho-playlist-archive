@@ -101,8 +101,7 @@ func main() {
 
 	go artistScraperWorker.ProcessResponeQueue(queueCtx)
 
-	log.Printf("Starting server on port: %v", os.Getenv("PORT"))
-	fmt.Println(apiCfg.ServerHost, apiCfg.ServerPort)
+	log.Printf("Starting server on port: %v", apiCfg.ServerPort)
 	err = http.ListenAndServe(fmt.Sprintf("%v:%v",apiCfg.ServerHost ,apiCfg.ServerPort), api.Routes())
 	if err != nil {
 		log.Fatal().Str("error", err.Error()).Msg("failed to start server")
