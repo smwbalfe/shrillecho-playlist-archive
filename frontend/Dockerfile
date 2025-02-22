@@ -1,14 +1,19 @@
-FROM node:18-alpine
+FROM node:21-alpine3.18
+
 WORKDIR /app
-COPY package.json package-lock.json ./
+
+COPY ./package*.json ./
+
+COPY ./yarn.lock ./
+RUN yarn install
+
+COPY ./ ./
+
 
 ARG NEXT_PUBLIC_SUPABASE_URL
 ARG NEXT_PUBLIC_SUPABASE_ANON_KEY
 ENV NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL
 ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY
 
-RUN npm ci
-COPY . .
-RUN npm run build
-EXPOSE 3000
-CMD ["npm", "start"]
+RUN yarn run build
+CMD ["yarn", "start"]
