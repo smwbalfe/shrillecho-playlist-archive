@@ -97,7 +97,9 @@ jobs:
           script: |
 
             bash ../scripts/ci/setup_docker.sh
-  
+    
+           
+
             if [ ! -f ~/.ssh/github_id_rsa ]; then
               mkdir -p ~/.ssh
               ssh-keygen -t rsa -b 4096 -f ~/.ssh/github_id_rsa -N ""
