@@ -149,4 +149,4 @@ jobs:
             echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u smwbalfe --password-stdin
 
             docker-compose -f docker-compose.prod.yml down
-            docker-compose -f docker-compose.prod.yml up
+            docker-compose -f docker-compose.prod.yml up -d
