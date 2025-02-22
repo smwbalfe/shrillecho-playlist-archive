@@ -112,6 +112,7 @@ jobs:
             fi
             
             ssh-keyscan -H github.com >> ~/.ssh/known_hosts
+            rm -rf shrillecho-playlist-archive
             git clone git@github.com:smwbalfe/shrillecho-playlist-archive.git
             cd shrillecho-playlist-archive
             docker-compose down
