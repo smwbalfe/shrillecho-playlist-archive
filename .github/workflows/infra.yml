@@ -88,11 +88,22 @@ jobs:
     environment: shrillecho
     runs-on: ubuntu-latest
     steps:
-      - name: Write hello world to remote
+      - name: Setup VPS GitHub access
         uses: appleboy/ssh-action@master
         with:
           host: ${{ needs.terraform.outputs.droplet_ip }}
           username: root
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            echo "Hello World!" > ~/hello.txt
+            if [ ! -f ~/.ssh/github_id_rsa ]; then
+              mkdir -p ~/.ssh
+              ssh-keygen -t rsa -b 4096 -f ~/.ssh/github_id_rsa -N ""
+              echo "Host github.com" >> ~/.ssh/config
+              echo "  IdentityFile ~/.ssh/github_id_rsa" >> ~/.ssh/config
+              echo "  StrictHostKeyChecking no" >> ~/.ssh/config
+              cat ~/.ssh/github_id_rsa.pub
+            fi
+            ssh-keyscan -H github.com >> ~/.ssh/known_hosts
+            git clone git@github.com:your-username/your-repo.git
+            cd your-repo
+            docker-compose down
