@@ -19,7 +19,7 @@ services:
       - "3000:3000"
     depends_on:
       - redis 
-      - app
+      - backend
   redis:
     image: redis:7-alpine
     ports:
