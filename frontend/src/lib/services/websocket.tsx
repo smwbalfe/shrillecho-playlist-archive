@@ -14,7 +14,7 @@ import { Checkbox } from '@/src/lib/components/ui/checkbox';
 
 import env from '../config/env';
 
-// Debug logger utility
+// Debug logger utilitys
 const debugLog = (area: string, message: string, data?: any) => {
     const timestamp = new Date().toISOString();
     console.log(`[${timestamp}] [${area}] ${message}`, data ? data : '');

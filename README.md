@@ -1,6 +1,9 @@
 # shrillecho playlist archive
 
-### Features
+- Architected distributed web crawling system using Go microservices and Redis queues, enabling parallel Spotify API processing
+- Implemented real-time updates using WebSocket protocol and event-driven architecture for live crawl status
+- Designed CI/CD pipeline using GitHub Actions, Docker, and Terraform for automated deployment to Digital Ocean
+- Built responsive Next.js frontend with Supabase authentication and PostgreSQL database integration
 
 ### System
 
@@ -59,8 +62,6 @@ flowchart TD
 
 ### Devops
 
-# Devops
-
 - Hosting: VPS
 - Infrastructure: Terraform
 - Terraform state: AWS S3
@@ -79,6 +80,9 @@ flowchart TD
     classDef frontend fill:#9f9,stroke:#333,color:#000
     classDef deploy fill:#f9f,stroke:#333,color:#000
     classDef storage fill:#fc9,stroke:#333,color:#000
+    classDef container fill:#c9f,stroke:#333,color:#000
+    classDef nginx fill:#ff9,stroke:#333,color:#000
+    classDef watchtower fill:#f99,stroke:#333,color:#fff
 
     %% Infrastructure Pipeline
     subgraph infra[Infrastructure Pipeline]
@@ -87,7 +91,7 @@ flowchart TD
         B[Terraform Init/Plan/Apply]:::infrastructure
         C[Configure VPS]:::infrastructure
         D[Setup SSL & ENV]:::infrastructure
-        E[Deploy Application]:::infrastructure
+        E[Deploy Compose Stack]:::infrastructure
         A --> B --> C --> D --> E
     end
 
@@ -111,6 +115,23 @@ flowchart TD
         J --> K --> L --> M
     end
 
+    %% Deployed Services
+    subgraph deployed[Deployed Stack]
+        direction TB
+        R[Redis:7-alpine]:::container
+        BE[Backend Service<br>:8000]:::container
+        FE[Frontend Service<br>:3000]:::container
+        NG[Nginx<br>:80,:443]:::nginx
+        WT[Watchtower]:::watchtower
+        
+        R <--> BE
+        BE <--> FE
+        FE <--> NG
+        BE <--> NG
+        WT --> BE
+        WT --> FE
+    end
+
     %% External Services
     S3[(AWS S3)]:::storage
     GHCR[(GitHub Container Registry)]:::storage
@@ -121,7 +142,7 @@ flowchart TD
     B --> VPS
     I --> GHCR
     M --> GHCR
-    GHCR --> E
-    E --> VPS
+    GHCR --> WT
+    E --> deployed
 ```
 
