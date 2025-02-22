@@ -157,8 +157,12 @@ jobs:
           script: |
             cd shrillecho-playlist-archive/infra
             mkdir -p ./nginx/letsencrypt/live/shrillecho.app
-            echo ${{secrets.PRIVKEY_PEM}} > ./nginx/letsencrypt/live/shrillecho.app/privkey1.pem
-            echo ${{secrets.FULLCHAIN_PEM}} > ./nginx/letsencrypt/live/shrillecho.app/fullchain1.pem
+            cat << 'EOF' > ./nginx/letsencrypt/live/shrillecho.app/privkey1.pem
+            ${{secrets.PRIVKEY_PEM}}
+            EOF
+            cat << 'EOF' > ./nginx/letsencrypt/live/shrillecho.app/fullchain1.pem
+            ${{secrets.FULLCHAIN_PEM}}
+            EOF
             chmod 600 ./nginx/letsencrypt/live/shrillecho.app/privkey1.pem
             chmod 600 ./nginx/letsencrypt/live/shrillecho.app/fullchain1.pem
 
