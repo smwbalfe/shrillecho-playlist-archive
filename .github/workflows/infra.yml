@@ -128,16 +128,13 @@ jobs:
             git clone git@github.com:smwbalfe/shrillecho-playlist-archive.git
             cd shrillecho-playlist-archive/infra
 
-            mkdir -p ./nginx/etc/letsencrypt/live/shrillecho.app
+            mkdir -p ./nginx/letsencrypt/live/shrillecho.app
 
-            echo ${{ secrets.PRIVKEY_PEM }} > ./nginx/etc/letsencrypt/live/shrillecho.app/privkey1.pem
-            echo ${{ secrets.FULLCHAIN_PEM }} > ./nginx/etc/letsencrypt/live/shrillecho.app/fullchain1.pem
+            echo ${{ secrets.PRIVKEY_PEM }} > ./nginx/letsencrypt/live/shrillecho.app/privkey1.pem
+            echo ${{ secrets.FULLCHAIN_PEM }} > ./nginx/letsencrypt/live/shrillecho.app/fullchain1.pem
 
-            echo poo > ./nginx/etc/letsencrypt/live/shrillecho.app/fullchain1.pem
-
-
-            chmod 600 ./nginx/etc/letsencrypt/live/shrillecho.app/privkey1.pem
-            chmod 600 ./nginx/etc/letsencrypt/live/shrillecho.app/fullchain1.pem
+            chmod 600 ./nginx/letsencrypt/live/shrillecho.app/privkey1.pem
+            chmod 600 ./nginx/letsencrypt/live/shrillecho.app/fullchain1.pem
 
             cat > .env.prod << 'EOF'
             REDIS_URL=${{ vars.REDIS_URL }}
