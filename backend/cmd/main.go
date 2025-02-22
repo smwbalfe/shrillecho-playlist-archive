@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"os"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/redis/go-redis/v9"
