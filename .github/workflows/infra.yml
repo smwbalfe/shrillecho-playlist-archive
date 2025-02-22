@@ -150,54 +150,46 @@ jobs:
 
       - name: Setup SSL Certificates
         uses: appleboy/ssh-action@master
-        env:
-          PRIVKEY_PEM: ${{ secrets.PRIVKEY_PEM }}
-          FULLCHAIN_PEM: ${{ secrets.FULLCHAIN_PEM }}
         with:
           host: ${{ needs.terraform.outputs.droplet_ip }}
           username: root
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          envs: PRIVKEY_PEM,FULLCHAIN_PEM
           script: |
             cd shrillecho-playlist-archive/infra
             mkdir -p ./nginx/letsencrypt/live/shrillecho.app
-            echo "$PRIVKEY_PEM" > ./nginx/letsencrypt/live/shrillecho.app/privkey1.pem
-            echo "$FULLCHAIN_PEM" > ./nginx/letsencrypt/live/shrillecho.app/fullchain1.pem
+            echo ${{secrets.PRIVKEY_PEM}} > ./nginx/letsencrypt/live/shrillecho.app/privkey1.pem
+            echo ${{secrets.FULLCHAIN_PEM}} > ./nginx/letsencrypt/live/shrillecho.app/fullchain1.pem
             chmod 600 ./nginx/letsencrypt/live/shrillecho.app/privkey1.pem
             chmod 600 ./nginx/letsencrypt/live/shrillecho.app/fullchain1.pem
 
       - name: Setup Environment Variables
         uses: appleboy/ssh-action@master
-        env:
-          REDIS_URL: ${{ vars.REDIS_URL }}
-          GO_PORT: ${{ vars.GO_PORT }}
-          POSTGRES_URL: ${{ secrets.POSTGRES_URL }}
-          SUPABASE_JWT_SECRET: ${{ secrets.SUPABASE_JWT_SECRET }}
-          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
         with:
           host: ${{ needs.terraform.outputs.droplet_ip }}
           username: root
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          envs: REDIS_URL,GO_PORT,POSTGRES_URL,SUPABASE_JWT_SECRET,SUPABASE_DB_PASSWORD
           script: |
             cd shrillecho-playlist-archive/infra
             cat > .env.prod << EOF
-            REDIS_URL=$REDIS_URL
-            GO_PORT=$GO_PORT
-            POSTGRES_URL=$POSTGRES_URL
-            SUPABASE_JWT_SECRET=$SUPABASE_JWT_SECRET
-            SUPABASE_DB_PASSWORD=$SUPABASE_DB_PASSWORD
+            GO_PORT=${{vars.GO_PORT}}
+            GO_HOST=${{vars.GO_HOST}}
+            REDIS_HOST=${{vars.REDIS_HOST}}
+            REDIS_PORT=${{vars.REDIS_PORT}}
+            ALLOWED_ORIGINS=${{vars.ALLOWED_ORIGINS}}
+            POSTGRES_PASSWORD=${{secrets.POSTGRES_PASSWORD}}
+            POSTGRES_HOST=${{secrets.POSTGRES_HOST}}
+            POSTGRES_PORT=${{secrets.POSTGRES_PORT}}
+            POSTGRES_DB=${{vars.POSTGRES_DB}}
+            POSTGRES_USER=${{vars.POSTGRES_USER}}
+            SUPABASE_JWT_SECRET=${{secrets.SUPABASE_JWT_SECRET}}
             EOF
 
       - name: Deploy Application
         uses: appleboy/ssh-action@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           host: ${{ needs.terraform.outputs.droplet_ip }}
           username: root
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          envs: GITHUB_TOKEN
           script: |
             cd shrillecho-playlist-archive/infra
             sudo systemctl docker start
