@@ -23,7 +23,7 @@ func InitializeServices(dbs *config.DatabaseConnections) (*config.AppServices, e
 
 	spClient, err := client.NewSpotifyClient()
 	if err != nil {
-		return nil, fmt.Errorf("failed to initialize spotify client: %w", err)
+		return nil, fmt.Errorf("failed to iinitialize spotify client: %w", err)
 	}
 
 	return &config.AppServices{
