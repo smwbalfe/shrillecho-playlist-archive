@@ -4,8 +4,6 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"os"
-
 	"backend/internal/api"
 	"backend/internal/config"
 	"backend/internal/db"
@@ -52,14 +50,14 @@ func InitializeDatabases(env *config.Environment) (*config.DatabaseConnections, 
 	}
 
 	pgConn := fmt.Sprintf(
-		"host=%s user=%s password=%s dbname=%s port=%s",
+		"host=%v user=%v password=%v dbname=%v port=%v",
 		env.PostgresDomain,
 		env.PostgresUser,
 		env.PostgresPassword,
 		env.PostgresDb,
 		5379,
 	)
-	
+
 	conn, err := pgx.Connect(context.Background(), pgConn)
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialize postgres: %w", err)
