@@ -50,13 +50,13 @@ func InitializeDatabases(env *config.Environment) (*config.DatabaseConnections, 
 	}
 
 	pgConn := fmt.Sprintf(
-		"host=%v user=%v password=%v dbname=%v port=%v",
-		env.PostgresDomain,
+		"postgres://%v:%v@%v:%v/%v",
 		env.PostgresUser,
 		env.PostgresPassword,
-		env.PostgresDb,
+		env.PostgresDomain,
 		env.PostgresPort,
-	)
+		env.PostgresDb,
+		)
 
 	conn, err := pgx.Connect(context.Background(), pgConn)
 	if err != nil {
