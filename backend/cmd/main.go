@@ -53,7 +53,7 @@ func InitializeDatabases(env *config.Environment) (*config.DatabaseConnections, 
 		"postgres://%v:%v@%v:%v/%v",
 		env.PostgresUser,
 		env.PostgresPassword,
-		env.PostgresDomain,
+		env.PostgresHost,
 		env.PostgresPort,
 		env.PostgresDb,
 	)

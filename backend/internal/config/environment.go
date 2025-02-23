@@ -8,7 +8,6 @@ import (
 type PostgresConfig struct {
 	PostgresHost     string
 	PostgresPassword string
-	PostgresDomain   string
 	PostgresDb       string
 	PostgresUser     string
 	PostgresPort string
@@ -35,7 +34,6 @@ type Environment struct {
 func LoadEnv() Environment {
 	postgresHost := os.Getenv("POSTGRES_HOST")
 	postgresPassword := os.Getenv("POSTGRES_PASSWORD")
-	postgresDomain := os.Getenv("POSTGRES_DOMAIN")
 	postgresDb := os.Getenv("POSTGRES_DB")
 	postgresUser := os.Getenv("POSTGRES_USER")
 	postgresPort := os.Getenv("POSTGRES_PORT")
@@ -72,7 +70,6 @@ func LoadEnv() Environment {
 		PostgresConfig: PostgresConfig{
 			PostgresHost:     postgresHost,
 			PostgresPassword: postgresPassword,
-			PostgresDomain:   postgresDomain,
 			PostgresDb:       postgresDb,
 			PostgresUser:     postgresUser,
 			PostgresPort: postgresPort,
