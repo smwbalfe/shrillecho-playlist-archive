@@ -121,7 +121,7 @@ jobs:
           username: root
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            cd /root/deployment
+            cd /root/deployment/infra
             mkdir -p ./nginx/letsencrypt/live/shrillecho.app
             cat << 'EOF' > ./nginx/letsencrypt/live/shrillecho.app/privkey1.pem
             ${{secrets.PRIVKEY_PEM}}
@@ -139,7 +139,7 @@ jobs:
           username: root
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            cd /root/deployment
+            cd /root/deployment/infra
             cat > .env.prod << EOF
             GO_PORT=${{vars.GO_PORT}}
             GO_HOST=${{vars.GO_HOST}}
@@ -161,7 +161,7 @@ jobs:
           username: root
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            cd /root/deployment
+            cd /root/deployment/infra
             sudo systemctl docker start
             echo "$GITHUB_TOKEN" | docker login ghcr.io -u smwbalfe --password-stdin
             docker-compose -f docker-compose.yml down
