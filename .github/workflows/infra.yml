@@ -87,6 +87,9 @@ jobs:
     needs: terraform
     environment: shrillecho
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./infra
     steps:
       - uses: actions/checkout@v4
 
@@ -110,7 +113,7 @@ jobs:
           source: |
             infra/docker-compose.yml
             infra/nginx/*
-            
+
           target: "/root/deployment"
           strip_components: 1
 
