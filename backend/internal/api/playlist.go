@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math/rand"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/gofrs/uuid/v5"
@@ -26,35 +27,36 @@ func (a *api) CollectPlaylists(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// pool, err := utils.ParseQueryInt(r.URL.Query().Get("pool"))
+	pool, err := utils.ParseQueryInt(r.URL.Query().Get("pool"))
+	
 	if err != nil {
-		http.Error(w, "invalid pool parameter", http.StatusBadRequest)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	playlists, err := a.playlistRepo.FetchCachedPlaylists(r.Context(), userID)
+	playlists, err := a.playlistRepo.FetchCachedPlaylists(r.Context(), strconv.Itoa(pool))
 	if len(playlists) == 0 || err != nil {
 		fmt.Println(userID)
-		artists, err := a.userRepo.GetUserArtists(r.Context(), userID)
-	
+		artists, err := a.userRepo.GetUserArtistsByUserAndScrapeID(r.Context(), userID, int64(pool))
+
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 		playlists = a.spotifyService.GetArtistDiscoveredOn(artists, make(chan struct{}, 100))
-		if err := a.playlistRepo.CachePlaylists(r.Context(), userID, playlists, time.Hour); err != nil {
+		if err := a.playlistRepo.CachePlaylists(r.Context(), strconv.Itoa(pool), playlists, time.Hour); err != nil {
 			log.Printf("Failed to cache playlists: %v", err)
 		}
 	}
-	
+
 	if limitInt > 0 && limitInt < len(playlists) {
 		rand.Shuffle(len(playlists), func(i, j int) {
 			playlists[i], playlists[j] = playlists[j], playlists[i]
 		})
 		playlists = playlists[:limitInt]
 	}
-	if (len(playlists) == 0){
-		http.Error(w, "no playlists were found", http.StatusInternalServerError )
+	if len(playlists) == 0 {
+		http.Error(w, "no playlists were found", http.StatusInternalServerError)
 		return
 	}
 	utils.Json(w, r, playlists)

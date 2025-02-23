@@ -39,7 +39,7 @@ func (a *api) FilterPlaylists(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var allSimpleTracks []domain.SimpleTrack
-	
+
 	for _, playlist := range filterRequest.PlaylistsToFilter {
 		loadedTracks, err := a.spotify.GetPlaylistTracksExpanded(playlist)
 		if err != nil {

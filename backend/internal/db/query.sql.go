@@ -75,6 +75,40 @@ func (q *Queries) DeleteScrape(ctx context.Context, id int64) error {
 	return err
 }
 
+const getArtistsByUserAndScrapeID = `-- name: GetArtistsByUserAndScrapeID :many
+SELECT a.artist_id
+FROM artists a
+JOIN scrape_artists sa ON sa.artist_id = a.id
+JOIN scrapes s ON s.id = sa.scrape_id
+WHERE s.user_id = $1
+AND s.id = $2
+`
+
+type GetArtistsByUserAndScrapeIDParams struct {
+	UserID pgtype.UUID `json:"user_id"`
+	ID     int64       `json:"id"`
+}
+
+func (q *Queries) GetArtistsByUserAndScrapeID(ctx context.Context, arg GetArtistsByUserAndScrapeIDParams) ([]string, error) {
+	rows, err := q.db.Query(ctx, getArtistsByUserAndScrapeID, arg.UserID, arg.ID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []string
+	for rows.Next() {
+		var artist_id string
+		if err := rows.Scan(&artist_id); err != nil {
+			return nil, err
+		}
+		items = append(items, artist_id)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getScrapeArtists = `-- name: GetScrapeArtists :many
 SELECT a.id, a.artist_id
 FROM artists a

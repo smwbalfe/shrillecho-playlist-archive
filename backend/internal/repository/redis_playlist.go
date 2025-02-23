@@ -5,8 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"time"
-
-	"github.com/gofrs/uuid/v5"
 	"github.com/redis/go-redis/v9"
 	"gitlab.com/smwbalfe/spotify-client/data"
 )
@@ -21,8 +19,8 @@ func NewRedisPlaylistRepository(client *redis.Client) RedisPlaylistRepository {
 	}
 }
 
-func (r *RedisPlaylistRepository) FetchCachedPlaylists(ctx context.Context, userID uuid.UUID) ([]data.PlaylistArchiveItem, error) {
-	cacheKey := fmt.Sprintf("playlists:%s", userID.String())
+func (r *RedisPlaylistRepository) FetchCachedPlaylists(ctx context.Context, pool string) ([]data.PlaylistArchiveItem, error) {
+	cacheKey := fmt.Sprintf("playlists:%s", pool)
 	cached, err := r.redis.Get(ctx, cacheKey).Result()
 	if err != nil {
 		return nil, err
@@ -34,8 +32,8 @@ func (r *RedisPlaylistRepository) FetchCachedPlaylists(ctx context.Context, user
 	return playlists, nil
 }
 
-func (r *RedisPlaylistRepository) CachePlaylists(ctx context.Context, userID uuid.UUID, playlists []data.PlaylistArchiveItem, ttl time.Duration) error {
-	cacheKey := fmt.Sprintf("playlists:%s", userID.String())
+func (r *RedisPlaylistRepository) CachePlaylists(ctx context.Context, pool string, playlists []data.PlaylistArchiveItem, ttl time.Duration) error {
+	cacheKey := fmt.Sprintf("playlists:%s", pool)
 	cached, err := json.Marshal(playlists)
 	if err != nil {
 		return err

@@ -15,13 +15,14 @@ import (
 )
 
 type ArtistScrapeWorker struct {
-	Spotify    *client.SpotifyClient
-	Scraper    *service.ArtistScraperService
-	Queue      *service.RedisQueue
-	artistRepo repository.PostgresArtistRepository
-	scrapeRepo repository.PostgresScrapeRepository
-	wsConn *websocket.Conn
-    wsMutex sync.Mutex
+	Spotify        *client.SpotifyClient
+	Scraper        *service.ArtistScraperService
+	Queue          *service.RedisQueue
+	artistRepo     repository.PostgresArtistRepository
+	scrapeRepo     repository.PostgresScrapeRepository
+	wsConn         *websocket.Conn
+	wsMutex        sync.Mutex
+	SpotifyService service.SpotifyService
 }
 
 func NewArtistScrapeWorker(sharedCfg *config.SharedConfig) ArtistScrapeWorker {
@@ -30,19 +31,22 @@ func NewArtistScrapeWorker(sharedCfg *config.SharedConfig) ArtistScrapeWorker {
 
 	artistRepo := repository.NewPostgresArtistRepository(sharedCfg.Dbs.Postgres)
 
+	spotifyService := service.NewSpotifyService(sharedCfg.Services.Spotify)
+
 	return ArtistScrapeWorker{
-		Spotify:    sharedCfg.Services.Spotify,
-		scrapeRepo: sharedCfg.Services.ScrapeRepo,
-		artistRepo: artistRepo,
-		Queue:      sharedCfg.Services.Queue,
-		Scraper:    &artistScraper,
+		Spotify:        sharedCfg.Services.Spotify,
+		scrapeRepo:     sharedCfg.Services.ScrapeRepo,
+		artistRepo:     artistRepo,
+		Queue:          sharedCfg.Services.Queue,
+		Scraper:        &artistScraper,
+		SpotifyService: spotifyService,
 	}
 }
 
 func (w *ArtistScrapeWorker) SetWebsocketConnection(conn *websocket.Conn) {
-    w.wsMutex.Lock()
-    defer w.wsMutex.Unlock()
-    w.wsConn = conn
+	w.wsMutex.Lock()
+	defer w.wsMutex.Unlock()
+	w.wsConn = conn
 }
 
 func (scrp *ArtistScrapeWorker) ProcessScrapeQueue(queueCtx context.Context) {
@@ -51,7 +55,7 @@ func (scrp *ArtistScrapeWorker) ProcessScrapeQueue(queueCtx context.Context) {
 		case <-queueCtx.Done():
 			return
 		default:
-			
+
 			var scrapeJob service.ScrapeJob
 
 			err := scrp.Queue.PopRequest(queueCtx, &scrapeJob)
@@ -64,9 +68,9 @@ func (scrp *ArtistScrapeWorker) ProcessScrapeQueue(queueCtx context.Context) {
 			}
 
 			artists, err := scrp.Scraper.TriggerArtistScrape(
-				queueCtx, 
-				scrapeJob.ID, 
-				scrapeJob.Artist, 
+				queueCtx,
+				scrapeJob.ID,
+				scrapeJob.Artist,
 				scrapeJob.Depth,
 			)
 
@@ -79,6 +83,12 @@ func (scrp *ArtistScrapeWorker) ProcessScrapeQueue(queueCtx context.Context) {
 
 			scrapeJob.Status = "success"
 			scrapeJob.Artists = artists
+			artistName, err := scrp.SpotifyService.GetArtistName(scrapeJob.Artist)
+			if err != nil {
+				log.Printf("error getting name: %v", err)
+				scrapeJob.Artist = "N/A"
+			}
+			scrapeJob.Artist = artistName
 			scrp.Queue.PushResponse(queueCtx, &scrapeJob)
 		}
 	}
@@ -90,7 +100,7 @@ func (scrp *ArtistScrapeWorker) ProcessResponeQueue(queueCtx context.Context) {
 		case <-queueCtx.Done():
 			return
 		default:
-			
+
 			var scrapeJob service.ScrapeJob
 
 			err := scrp.Queue.PopResponse(queueCtx, &scrapeJob)
@@ -103,13 +113,13 @@ func (scrp *ArtistScrapeWorker) ProcessResponeQueue(queueCtx context.Context) {
 			fmt.Printf("received response: %v", len(scrapeJob.Artists))
 
 			var wg sync.WaitGroup
-			semaphore := make(chan struct{}, 100) 
+			semaphore := make(chan struct{}, 500)
 
 			for _, artist := range scrapeJob.Artists {
 				wg.Add(1)
 				currentArtist := artist
-				
-				semaphore <- struct{}{} 
+
+				semaphore <- struct{}{}
 				go func() {
 					defer wg.Done()
 					defer func() { <-semaphore }()
@@ -120,16 +130,23 @@ func (scrp *ArtistScrapeWorker) ProcessResponeQueue(queueCtx context.Context) {
 			wg.Wait()
 
 			if scrp.wsConn != nil {
-				
-				wsResponse := transport.ArtistWsResponse {
-					ID: int(scrapeJob.ID),
-					Depth: scrapeJob.Depth,
-					SeedArtist: scrapeJob.Artist,
-					TotalArtists: len(scrapeJob.Artists) ,
+
+				artistName, err := scrp.SpotifyService.GetArtistName(scrapeJob.Artist)
+				if err != nil {
+					log.Printf("error getting name: %v", err)
+					scrapeJob.Artist = "N/A"
+				}
+				scrapeJob.Artist = artistName
+
+				wsResponse := transport.ArtistWsResponse{
+					ID:           int(scrapeJob.ID),
+					Depth:        scrapeJob.Depth,
+					SeedArtist:   scrapeJob.Artist,
+					TotalArtists: len(scrapeJob.Artists),
 				}
 
 				scrp.wsConn.WriteJSON(wsResponse)
-			} 
+			}
 		}
 	}
 }

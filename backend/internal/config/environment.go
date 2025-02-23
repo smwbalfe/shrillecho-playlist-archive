@@ -10,7 +10,7 @@ type PostgresConfig struct {
 	PostgresPassword string
 	PostgresDb       string
 	PostgresUser     string
-	PostgresPort string
+	PostgresPort     string
 }
 
 type RedisConfig struct {
@@ -72,7 +72,7 @@ func LoadEnv() Environment {
 			PostgresPassword: postgresPassword,
 			PostgresDb:       postgresDb,
 			PostgresUser:     postgresUser,
-			PostgresPort: postgresPort,
+			PostgresPort:     postgresPort,
 		},
 		RedisConfig: RedisConfig{
 			RedisHost: redisHost,

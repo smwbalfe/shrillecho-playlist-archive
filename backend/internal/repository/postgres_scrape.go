@@ -29,9 +29,9 @@ func (r *PostgresScrapeRepository) CreateScrapeArtist(ctx context.Context, scrap
 }
 
 func (r *PostgresScrapeRepository) GetScrapeByID(ctx context.Context, scrapeID int64) (bool, error) {
-    exists, err := r.postgres.GetScrapeByID(ctx, scrapeID)
-    if err != nil {
-        return false, err
-    }
-    return exists, nil
+	exists, err := r.postgres.GetScrapeByID(ctx, scrapeID)
+	if err != nil {
+		return false, err
+	}
+	return exists, nil
 }

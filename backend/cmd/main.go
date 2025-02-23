@@ -1,9 +1,6 @@
 package main
 
 import (
-	"context"
-	"fmt"
-	"net/http"
 	"backend/internal/api"
 	"backend/internal/config"
 	"backend/internal/db"
@@ -11,11 +8,13 @@ import (
 	"backend/internal/services"
 	"backend/internal/utils"
 	"backend/internal/workers"
-
-	"github.com/jackc/pgx/v5"
+	"context"
+	"fmt"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/redis/go-redis/v9"
 	"github.com/rs/zerolog/log"
 	"gitlab.com/smwbalfe/spotify-client"
+	"net/http"
 )
 
 func InitializeServices(dbs *config.DatabaseConnections) (*config.AppServices, error) {
@@ -43,7 +42,6 @@ func InitializeDatabases(env *config.Environment) (*config.DatabaseConnections, 
 	if _, err := rdb.Ping(context.Background()).Result(); err != nil {
 		return nil, fmt.Errorf("failed to connect to redis: %w", err)
 	}
-
 	err := utils.ResetRedis(rdb, context.Background())
 	if err != nil {
 		panic("failed to reset redis")
@@ -58,16 +56,22 @@ func InitializeDatabases(env *config.Environment) (*config.DatabaseConnections, 
 		env.PostgresDb,
 	)
 
-	fmt.Println(pgConn)
-	conn, err := pgx.Connect(context.Background(), pgConn)
+	poolConfig, err := pgxpool.ParseConfig(pgConn)
 	if err != nil {
-		return nil, fmt.Errorf("failed to initialize postgres: %w", err)
+		return nil, fmt.Errorf("failed to parse postgres config: %w", err)
 	}
-	queries := db.New(conn)
+	poolConfig.MaxConns = 10
+
+	pool, err := pgxpool.New(context.Background(), pgConn)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create pool: %w", err)
+	}
+
+	queries := db.New(pool)
 	return &config.DatabaseConnections{
 		Redis:    rdb,
 		Postgres: queries,
-		PgConn:   conn,
+		PgConn:   pool,
 	}, nil
 }
 
@@ -81,7 +85,7 @@ func main() {
 	if err != nil {
 		log.Fatal().Err(err).Msg("failed to initialize databases")
 	}
-	defer dbs.PgConn.Close(ctx)
+	defer dbs.PgConn.Close()
 
 	services, err := InitializeServices(dbs)
 	if err != nil {
@@ -109,7 +113,7 @@ func main() {
 	go artistScraperWorker.ProcessResponeQueue(queueCtx)
 
 	log.Printf("Starting server on port: %v", apiCfg.ServerPort)
-	err = http.ListenAndServe(fmt.Sprintf("%v:%v",apiCfg.ServerHost ,apiCfg.ServerPort), api.Routes())
+	err = http.ListenAndServe(fmt.Sprintf("%v:%v", apiCfg.ServerHost, apiCfg.ServerPort), api.Routes())
 	if err != nil {
 		log.Fatal().Str("error", err.Error()).Msg("failed to start server")
 	}

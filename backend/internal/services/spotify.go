@@ -21,6 +21,38 @@ func NewSpotifyService(spotify *client.SpotifyClient) SpotifyService {
 	}
 }
 
+func (srv *SpotifyService) GetArtistGenres(artistIDs []string) ([]string, error) {
+	artistsExpanded, err := srv.spotify.GetArtists(artistIDs)
+	if err != nil {
+		return []string{}, err
+	}
+	uniqueGenres := make(map[string]bool)
+	for _, artist := range artistsExpanded.Artists {
+		for _, genre := range artist.Genres {
+			uniqueGenres[genre] = true
+		}
+	}
+	result := make([]string, 0, len(uniqueGenres))
+	for genre := range uniqueGenres {
+		result = append(result, genre)
+	}
+	return result, nil
+}
+
+func (srv *SpotifyService) GetArtistName(artist string) (string, error) {
+
+	parsedID, err := utils.ExtractSpotifyID(artist)
+
+	if err != nil {
+		return "", err
+	}
+	artistSingle, err := srv.spotify.GetArtists([]string{parsedID})
+	if err != nil {
+		return "", err
+	}
+	return artistSingle.Artists[0].Name, nil
+}
+
 func (srv *SpotifyService) GetPlaylistGenres(playlistID string) ([]string, error) {
 	tracks, err := srv.spotify.GetPlaylistTracksExpanded(playlistID)
 	if err != nil {

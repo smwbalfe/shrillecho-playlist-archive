@@ -7,7 +7,7 @@ type FilterPlaylistsRequest struct {
 	PlaylistsToRemove []string `json:"playlists_to_remove"`
 	Genres            []string `json:"genres"`
 	ApplyUnique       bool     `json:"tracks"`
-	TrackLimit int `json:"track_limit"`
+	TrackLimit        int      `json:"track_limit"`
 }
 
 type FilterPlaylistResponse struct {
