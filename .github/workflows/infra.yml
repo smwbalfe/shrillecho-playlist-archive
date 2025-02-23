@@ -111,8 +111,8 @@ jobs:
           username: root
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           source: |
-            infra/docker-compose.yml
-            infra/nginx/*
+            ./infra/docker-compose.yml
+            ./infra/nginx/*
 
           target: "/root/deployment"
           strip_components: 1
