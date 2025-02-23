@@ -4,11 +4,8 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"os"
 
-	"github.com/jackc/pgx/v5"
-	"github.com/redis/go-redis/v9"
-	"github.com/rs/zerolog/log"
-	"gitlab.com/smwbalfe/spotify-client"
 	"backend/internal/api"
 	"backend/internal/config"
 	"backend/internal/db"
@@ -16,6 +13,11 @@ import (
 	"backend/internal/services"
 	"backend/internal/utils"
 	"backend/internal/workers"
+
+	"github.com/jackc/pgx/v5"
+	"github.com/redis/go-redis/v9"
+	"github.com/rs/zerolog/log"
+	"gitlab.com/smwbalfe/spotify-client"
 )
 
 func InitializeServices(dbs *config.DatabaseConnections) (*config.AppServices, error) {
@@ -49,8 +51,15 @@ func InitializeDatabases(env *config.Environment) (*config.DatabaseConnections, 
 		panic("failed to reset redis")
 	}
 
-	pgConn := "postgresql://postgres.dbhaywqsvpnivdzodkwg:H2sxfCRlRpPUYX18@aws-0-eu-west-2.pooler.supabase.com:5432/postgres?preferSimpleProtocol=True"
-
+	pgConn := fmt.Sprintf(
+		"host=%s user=%s password=%s dbname=%s port=%s",
+		env.PostgresDomain,
+		env.PostgresUser,
+		env.PostgresPassword,
+		env.PostgresDb,
+		5379,
+	)
+	
 	conn, err := pgx.Connect(context.Background(), pgConn)
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialize postgres: %w", err)
