@@ -108,7 +108,7 @@ jobs:
         uses: burnett01/rsync-deployments@6.0.0
         with:
           switches: -avzr --delete
-          path: infra/docker-compose.yml infra/nginx/
+          path: infra/docker-compose.yml infra/nginx/*
           remote_path: /root/deployment/
           remote_host: ${{ needs.terraform.outputs.droplet_ip }}
           remote_user: root
