@@ -56,8 +56,9 @@ func InitializeDatabases(env *config.Environment) (*config.DatabaseConnections, 
 		env.PostgresDomain,
 		env.PostgresPort,
 		env.PostgresDb,
-		)
+	)
 
+	fmt.Println(pgConn)
 	conn, err := pgx.Connect(context.Background(), pgConn)
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialize postgres: %w", err)
