@@ -25,6 +25,7 @@ func (r *PostgresUserRepository) CreateUser(ctx context.Context, userID uuid.UUI
 	return r.postgres.CreateUser(ctx, pgtype.UUID{Bytes: userID, Valid: true})
 }
 
+
 func (r *PostgresUserRepository) GetUserByID(ctx context.Context, userID uuid.UUID) (bool, error) {
     exists, err := r.postgres.GetUserByID(ctx, pgtype.UUID{Bytes: userID, Valid: true})
     if err != nil {

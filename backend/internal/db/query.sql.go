@@ -161,3 +161,24 @@ func (q *Queries) GetUserByID(ctx context.Context, id pgtype.UUID) (bool, error)
 	err := row.Scan(&exists)
 	return exists, err
 }
+
+const getUserScrapes = `-- name: GetUserScrapes :one
+SELECT DISTINCT a.artist_id
+FROM artists a
+JOIN scrape_artists sa ON sa.artist_id = a.id
+JOIN scrapes s ON s.id = sa.scrape_id
+WHERE s.user_id = $1 AND s.id = $2
+ORDER BY a.artist_id
+`
+
+type GetUserScrapesParams struct {
+	UserID pgtype.UUID `json:"user_id"`
+	ID     int64       `json:"id"`
+}
+
+func (q *Queries) GetUserScrapes(ctx context.Context, arg GetUserScrapesParams) (string, error) {
+	row := q.db.QueryRow(ctx, getUserScrapes, arg.UserID, arg.ID)
+	var artist_id string
+	err := row.Scan(&artist_id)
+	return artist_id, err
+}

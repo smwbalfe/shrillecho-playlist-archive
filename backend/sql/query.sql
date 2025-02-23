@@ -50,3 +50,11 @@ SELECT EXISTS (
     FROM scrapes 
     WHERE id = $1
 );
+
+-- name: GetUserScrapes :one
+SELECT DISTINCT a.artist_id
+FROM artists a
+JOIN scrape_artists sa ON sa.artist_id = a.id
+JOIN scrapes s ON s.id = sa.scrape_id
+WHERE s.user_id = $1 AND s.id = $2
+ORDER BY a.artist_id;

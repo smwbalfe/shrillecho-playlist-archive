@@ -56,7 +56,7 @@ export const PlaylistGrid: FC = () => {
     const scrapePlaylists = async () => {
         try {
             setIsScraping(true)
-            const data = await api.get(`/scrape/playlists?limit=${limit}`)
+            const data = await api.get(`/scrape/playlists?limit=${limit}?pool=`)
             setPlaylistData(data)
             setActiveView('playlists')
         } catch (error) {
