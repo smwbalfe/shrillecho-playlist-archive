@@ -11,6 +11,7 @@ type PostgresConfig struct {
 	PostgresDomain   string
 	PostgresDb       string
 	PostgresUser     string
+	PostgresPort string
 }
 
 type RedisConfig struct {
@@ -37,6 +38,7 @@ func LoadEnv() Environment {
 	postgresDomain := os.Getenv("POSTGRES_DOMAIN")
 	postgresDb := os.Getenv("POSTGRES_DB")
 	postgresUser := os.Getenv("POSTGRES_USER")
+	postgresPort := os.Getenv("POSTGRES_PORT")
 
 	redisHost := os.Getenv("REDIS_HOST")
 	redisPort := os.Getenv("REDIS_PORT")
@@ -73,6 +75,7 @@ func LoadEnv() Environment {
 			PostgresDomain:   postgresDomain,
 			PostgresDb:       postgresDb,
 			PostgresUser:     postgresUser,
+			PostgresPort: postgresPort,
 		},
 		RedisConfig: RedisConfig{
 			RedisHost: redisHost,

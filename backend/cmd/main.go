@@ -55,7 +55,7 @@ func InitializeDatabases(env *config.Environment) (*config.DatabaseConnections, 
 		env.PostgresUser,
 		env.PostgresPassword,
 		env.PostgresDb,
-		5379,
+		env.PostgresPort,
 	)
 
 	conn, err := pgx.Connect(context.Background(), pgConn)
