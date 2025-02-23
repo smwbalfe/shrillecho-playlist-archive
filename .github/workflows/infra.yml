@@ -105,17 +105,14 @@ jobs:
             chmod +x /usr/local/bin/docker-compose
 
       - name: Copy Deployment Files
-        uses: appleboy/scp-action@master
+        uses: burnett01/rsync-deployments@6.0.0
         with:
-          host: ${{ needs.terraform.outputs.droplet_ip }}
-          username: root
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: |
-            ./docker-compose.yml
-            ./nginx/*
-
-          target: "/root/deployment"
-          strip_components: 1
+          switches: -avzr --delete
+          path: infra/docker-compose.yml infra/nginx/
+          remote_path: /root/deployment/
+          remote_host: ${{ needs.terraform.outputs.droplet_ip }}
+          remote_user: root
+          remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: Setup SSL Certificates
         uses: appleboy/ssh-action@master
