@@ -24,7 +24,7 @@ export const ArtistGridUI = ({
                     onChange={(e) => onDepthChange(e.target.value)}
                     placeholder="Depth"
                     min="1"
-                    max="15"
+                    max="3"
                     className="px-3 py-2 border rounded"
                 />
                 <button

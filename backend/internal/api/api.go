@@ -1,14 +1,17 @@
 package api
 
 import (
+	// "backend/internal/api/middleware"
 	"backend/internal/api/middleware"
 	"backend/internal/config"
 	"backend/internal/repository"
 	"backend/internal/services"
 	"backend/internal/workers"
 	"context"
-	"github.com/go-chi/chi/v5"
 	"net/http"
+
+	"github.com/go-chi/chi/v5"
+
 	// middlewarechi "github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
 	"github.com/gorilla/websocket"
@@ -89,17 +92,25 @@ func (a *api) Routes() *chi.Mux {
 	})
 
 	r.Group(func(r chi.Router) {
+
+		r.Use(middleware.CheckAuth)
+		
+		r.Route("/spotify", func(r chi.Router) {
+			r.Get("/playlist", a.PlaylistHandler)
+			r.Get("/playlists/genres", a.ReadPlaylistGenres)
+			r.Post("/playlist/filter", a.FilterPlaylists)
+			r.Post("/playlist/create", a.AddToPlaylist)
+		})
+	})
+
+	r.Group(func(r chi.Router) {
+
 		r.Use(middleware.CheckAuth)
 
 		r.Route("/scrape", func(r chi.Router) {
 			r.Post("/artists", a.ArtistScrape)
 			r.Get("/playlists", a.CollectPlaylists)
-		})
-
-		r.Route("/spotify", func(r chi.Router) {
-			r.Get("/playlist", a.PlaylistHandler)
-			r.Get("/playlists/genres", a.ReadPlaylistGenres)
-			r.Post("/playlist/filter", a.FilterPlaylists)
+			r.Get("/playlists_seed", a.PlaylistSeededScrape)
 		})
 
 		r.Route("/users", func(r chi.Router) {

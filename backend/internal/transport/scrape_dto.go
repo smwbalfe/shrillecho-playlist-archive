@@ -12,5 +12,5 @@ type ScrapeResponse struct {
 }
 
 type ScrapeTriggerResponse struct {
-	ScrapeID int64 `json:"id"`
+	ScrapeID string `json:"triggered"`
 }

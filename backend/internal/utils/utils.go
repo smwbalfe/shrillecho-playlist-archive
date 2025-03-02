@@ -174,3 +174,26 @@ func GetSimpleTrack(track data.Track) domain.SimpleTrack {
 	}
 	return simpleTrack
 }
+
+// ExtractSpotifyID extracts the base62 ID from various Spotify identifier formats
+// Handles:
+// - Full URLs: https://open.spotify.com/track/4iV5W9uYEdYUVa79Axb7Rh
+// - Spotify URIs: spotify:track:4iV5W9uYEdYUVa79Axb7Rh
+// - Direct base62 IDs: 4iV5W9uYEdYUVa79Axb7Rh
+func ParseSpotifyId(input string) (string, error) {
+	input = strings.TrimSpace(input)
+	urlPattern := regexp.MustCompile(`https?://open\.spotify\.com/(?:[a-z]+)/([a-zA-Z0-9]{22})`)
+	if match := urlPattern.FindStringSubmatch(input); len(match) > 1 {
+		return match[1], nil
+	}
+	uriPattern := regexp.MustCompile(`spotify:[a-z]+:([a-zA-Z0-9]{22})`)
+	if match := uriPattern.FindStringSubmatch(input); len(match) > 1 {
+		return match[1], nil
+	}
+	base62Pattern := regexp.MustCompile(`^[a-zA-Z0-9]{22}$`)
+	if base62Pattern.MatchString(input) {
+		return input, nil
+	}
+	return "", fmt.Errorf("invalid Spotify identifier format: %s", input)
+}
+

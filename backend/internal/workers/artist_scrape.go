@@ -110,7 +110,7 @@ func (scrp *ArtistScrapeWorker) ProcessResponeQueue(queueCtx context.Context) {
 				fmt.Println(scrapeJob)
 			}
 
-			fmt.Printf("received response: %v", len(scrapeJob.Artists))
+			fmt.Printf("received response: %v\n", len(scrapeJob.Artists))
 
 			var wg sync.WaitGroup
 			semaphore := make(chan struct{}, 500)
@@ -145,6 +145,7 @@ func (scrp *ArtistScrapeWorker) ProcessResponeQueue(queueCtx context.Context) {
 					TotalArtists: len(scrapeJob.Artists),
 				}
 
+				fmt.Println(wsResponse)
 				scrp.wsConn.WriteJSON(wsResponse)
 			}
 		}

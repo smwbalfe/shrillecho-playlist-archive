@@ -15,3 +15,9 @@ export const parseSpotifyId = (url: string): string => {
     return '';
   }
 }
+
+export const extractSpotifyId = (url: string): string | null  => {
+  const regex = /open\.spotify\.com\/(?:artist|album|track|playlist|show|episode)\/([a-zA-Z0-9]{22})(?:\?|$)/;
+  const match = url.match(regex);
+  return match ? match[1] : null;
+}

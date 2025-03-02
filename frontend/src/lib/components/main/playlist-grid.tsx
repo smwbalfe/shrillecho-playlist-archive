@@ -5,6 +5,8 @@ import { Music2, Loader2, ListMusic } from 'lucide-react'
 import { useApp } from '@/src/lib/context/app-state'
 import { parseSpotifyId } from '../../utils/utils'
 
+import { toast } from "sonner"
+
 interface Playlist {
     name: string
     cover_art: string
@@ -75,7 +77,7 @@ export const PlaylistGrid: FC = () => {
                 playlists_to_filter: playlistData.map(p => p.uri.split(':')[2]),
                 playlists_to_remove: app.playlists.map(p => parseSpotifyId(p)),
                 apply_unique: true,
-                track_limit: 100
+                track_limit: 99
             });
             console.log("setting tracks", data.tracks)
             setTracks(data.tracks)
@@ -85,6 +87,22 @@ export const PlaylistGrid: FC = () => {
         } finally {
             setIsLoadingTracks(false)
         }
+    }
+
+    const createPlaylist = async () => {
+        const data = await api.post('/spotify/playlist/create', {
+            tracks: tracks.map(track => track.id)
+        })
+
+        const spotifyAppUri = data.link.replace('https://open.spotify.com/', 'spotify:').replace(/\//g, ':');
+
+        toast("Playlist created", {
+            description: "Your new playlist is ready",
+            action: {
+                label: "View on Spotify",
+                onClick: () => window.open(spotifyAppUri, "_self"),
+            },
+        })
     }
 
     const PlaylistView = () => (
@@ -128,6 +146,9 @@ export const PlaylistGrid: FC = () => {
 
         return (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <button onClick={createPlaylist}>
+                    create playlist
+                </button>
                 {sortedTracks.map((track) => (
                     <div
                         key={track.id}
@@ -227,7 +248,7 @@ export const PlaylistGrid: FC = () => {
                                     : 'text-gray-500 hover:text-gray-700'}`}
                             >
                                 <ListMusic className="w-4 h-4 inline mr-2" />
-                                {/* Tracks {tracks.length > 0 && `(${tracks.length})`} */}
+                                Tracks {tracks.length > 0 && `(${tracks.length})`}
                             </button>
                         </div>
                     </div>

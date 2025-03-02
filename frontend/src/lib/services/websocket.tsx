@@ -45,7 +45,7 @@ export default function CompactWebSocketListener() {
     return (
         <div className="p-4">
             <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold">Artist Responses</h2>
+                <h2 className="text-lg font-semibold">Artist Pools</h2>
                 <div className="flex items-center gap-2 bg-white rounded-full px-3 py-1">
                     <div className={`h-2 w-2 rounded-full ${status === 'Connected' ? 'bg-green-500' : 'bg-red-500'}`} />
                     <span className="text-xs text-gray-500">{status}</span>
@@ -53,7 +53,7 @@ export default function CompactWebSocketListener() {
             </div>
 
             {app.scrapes?.length ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                <div className="grid grid-cols-3 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                     {app.scrapes.map(({ id, seed_artist, total_artists, depth }) => (
                         <Card key={id} className="p-3">
                             <div className="flex items-center justify-between mb-2">

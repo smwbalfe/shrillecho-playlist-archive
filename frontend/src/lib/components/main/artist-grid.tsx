@@ -4,9 +4,10 @@ import { useState } from 'react';
 import { api } from '@/src/lib/services/api';
 import { Artist } from '../../types/types';
 import { ArtistGridUI } from './artist-ui';
+import { extractSpotifyId } from '@/src/lib/utils/utils'
 
 export const ArtistGridContainer = () => {
-    const [artist, setArtist] = useState("");
+    const [artist, setArtist] = useState<string>("");
     const [depth, setDepth] = useState("2");
     const [isScraping, setIsScraping] = useState(false);
     const [artistData, setArtistData] = useState<Artist[]>([]);
@@ -15,7 +16,7 @@ export const ArtistGridContainer = () => {
         try {
             setIsScraping(true);
             const response = await api.post('/scrape/artists', {
-                artist,
+                artist: artist,
                 depth: parseInt(depth)
             });
             const artistsArray = response.artists?.filter((artist: any) => artist.id && artist.profile?.name) || [];

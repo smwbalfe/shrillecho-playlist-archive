@@ -18,6 +18,33 @@ func (a *api) PlaylistHandler(w http.ResponseWriter, r *http.Request) {
 	utils.Json(w, r, transport.PlaylistResponse{Playlists: sortedTracks})
 }
 
+
+type CreatePlaylistRequest struct {
+	Tracks []string `json:"tracks"`
+}
+
+type CreatePlaylistResponse struct {
+	Link string `json:"link"`
+}
+
+
+func (a *api) AddToPlaylist(w http.ResponseWriter, r *http.Request){
+	var createPlaylist CreatePlaylistRequest
+	if err := utils.ParseBody(r, &createPlaylist); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	userID, err := a.spotify.GetCurrentUserID()
+	if err != nil {
+		panic(err)
+	}
+	link, err := a.spotify.CreatePlaylistFromTracks(createPlaylist.Tracks, userID)
+	if err != nil{
+		panic(err)
+	}
+	utils.Json(w,r, CreatePlaylistResponse{Link: link})
+}
+
 func (a *api) ReadPlaylistGenres(w http.ResponseWriter, r *http.Request) {
 	playlistID := r.URL.Query().Get("id")
 	if playlistID == "" {
@@ -83,6 +110,6 @@ func (a *api) FilterPlaylists(w http.ResponseWriter, r *http.Request) {
 		allSimpleTracks = dedupedTracks
 	}
 
-	limit := min(len(allSimpleTracks), filterRequest.TrackLimit)
-	utils.Json(w, r, transport.FilterPlaylistResponse{Tracks: allSimpleTracks[:limit]})
+	_ = min(len(allSimpleTracks), filterRequest.TrackLimit)
+	utils.Json(w, r, transport.FilterPlaylistResponse{Tracks: allSimpleTracks})
 }
