@@ -1,7 +1,4 @@
-interface HeaderProps {
-    showArtists: boolean;
-    setShowArtists: (value: React.SetStateAction<boolean>) => void;
-}
+import { HeaderProps } from "../../types/types"
 
 export const Header = ({ showArtists, setShowArtists }: HeaderProps) => {
     return (

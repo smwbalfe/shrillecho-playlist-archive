@@ -1,42 +1,12 @@
 "use client"
 import { FC, useState } from 'react'
-import { api } from '@/src/lib/services/api'
 import { Music2, Loader2, ListMusic } from 'lucide-react'
-import { useApp } from '@/src/lib/context/app-state'
-import { parseSpotifyId } from '../../utils/utils'
-
 import { toast } from "sonner"
 
-interface Playlist {
-    name: string
-    cover_art: string
-    uri: string
-    saves: number
-}
-
-interface SimpleTrack {
-    name: string;
-    id: string;
-    artists: ArtistSimple[];
-    playcount: string;
-    coverArt: CoverArt;
-}
-
-interface ArtistSimple {
-    name: string;
-}
-
-interface CoverArt {
-    sources: Source[];
-}
-
-interface Source {
-    url: string;
-    height: number;
-    width: number;
-}
-
-type ViewState = 'playlists' | 'tracks';
+import { Playlist, SimpleTrack, ViewState } from '@/src/lib/types/types'
+import { useApp } from '@/src/lib/context/app-state'
+import { api } from '@/src/lib/services/api'
+import { parseSpotifyId } from '@/src/lib/utils/utils'
 
 export const PlaylistGrid: FC = () => {
     const [isScraping, setIsScraping] = useState(false)
