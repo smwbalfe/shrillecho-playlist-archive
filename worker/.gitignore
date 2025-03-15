@@ -45,6 +45,8 @@ id_rsa
 *.gpg
 *.asc
 
+config.json
+
 # CI/CD specific
 .terraform/
 *.tfstate
