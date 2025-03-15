@@ -1,0 +1,93 @@
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool
+*.out
+
+# Go workspace file
+go.work
+
+# Dependency directories
+vendor/
+
+# IDE specific files
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Environment variables and secrets
+.env
+.env.local
+.env.*.local
+*.env
+.env.development
+.env.test
+.env.production
+.env.backup
+.env.save
+
+# API keys and secrets
+*.pem
+*.key
+*.cert
+*.crt
+*.csr
+id_rsa
+*.gpg
+*.asc
+
+# CI/CD specific
+.terraform/
+*.tfstate
+*.tfstate.*
+.terraformrc
+terraform.rc
+.terraform.lock.hcl
+
+# Build outputs
+bin/
+dist/
+build/
+_build/
+.coverage
+coverage.html
+coverage.xml
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.bak
+*.log
+*.pid
+
+# Docker
+.docker/
+docker-compose.override.yml
+
+# Kubernetes
+kubeconfig
+*.kubeconfig
+.kube/
+
+# Package management
+node_modules/
+yarn.lock
+package-lock.json
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Cache directories
+.cache/

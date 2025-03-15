@@ -1,0 +1,16 @@
+version: '3.8'
+services:
+  child:
+    image: ghcr.io/smwbalfe/worker:latest
+    env_file:
+      - .env
+    network_mode: "host"
+  watchtower:
+    image: containrrr/watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./config.json:/config.json
+    command: --interval 15 --cleanup --debug
+    environment:
+      - WATCHTOWER_DEBUG=true
+    restart: unless-stopped
