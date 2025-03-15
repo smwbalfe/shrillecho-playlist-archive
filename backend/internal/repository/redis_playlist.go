@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"backend/internal/domain"
+	"github.com/smwbalfe/shrillecho-playlist-archive/backend/internal/domain"
 	"context"
 	"encoding/json"
 	"fmt"

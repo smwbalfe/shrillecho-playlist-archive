@@ -6,7 +6,7 @@ import (
 
 	"github.com/gofrs/uuid/v5"
 
-	"backend/internal/utils"
+	"github.com/smwbalfe/shrillecho-playlist-archive/backend/internal/utils"
 )
 
 func (a *api) RegisterUser(w http.ResponseWriter, r *http.Request) {

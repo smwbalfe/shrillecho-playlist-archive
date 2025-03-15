@@ -1,4 +1,4 @@
-module backend
+module github.com/smwbalfe/shrillecho-playlist-archive/backend
 
 go 1.23.4
 

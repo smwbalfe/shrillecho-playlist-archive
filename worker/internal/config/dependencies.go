@@ -2,7 +2,7 @@ package config
 
 import (
 	"github.com/redis/go-redis/v9"
-	client "gitlab.com/smwbalfe/spotify-client"
+	client "github.com/smwbalfe/shrillecho-playlist-archive/backend/pkg/client"
 	service "scraper/internal/services"
 )
 

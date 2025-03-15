@@ -1,12 +1,12 @@
 package utils
 
 import (
-	"backend/internal/domain"
+	"github.com/smwbalfe/shrillecho-playlist-archive/backend/internal/domain"
 	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/redis/go-redis/v9"
-	models "backend/pkg/client/endpoints/playlist/models"
+	models "github.com/smwbalfe/shrillecho-playlist-archive/backend/pkg/client/endpoints/playlist/models"
 	"io"
 	"net/http"
 	"net/url"

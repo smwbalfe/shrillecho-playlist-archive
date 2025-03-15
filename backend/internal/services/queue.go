@@ -2,7 +2,7 @@ package service
 
 import (
 	"context"
-	artModels "backend/pkg/client/endpoints/artist/models"
+	artModels "github.com/smwbalfe/shrillecho-playlist-archive/backend/pkg/client/endpoints/artist/models"
 )
 
 type ScrapeJob struct {

@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	models "backend/pkg/client/endpoints/playlist/models"
-	"backend/pkg/client/interface"
+	models "github.com/smwbalfe/shrillecho-playlist-archive/backend/pkg/client/endpoints/playlist/models"
+	"github.com/smwbalfe/shrillecho-playlist-archive/backend/pkg/client/interface"
 )
 
 const (

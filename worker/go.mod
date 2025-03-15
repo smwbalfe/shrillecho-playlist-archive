@@ -12,8 +12,8 @@ require (
 	github.com/mattn/go-isatty v0.0.19 // indirect
 	github.com/redis/go-redis/v9 v9.7.0 // indirect
 	github.com/rs/zerolog v1.33.0 // indirect
+	github.com/smwbalfe/shrillecho-playlist-archive v0.0.0-20250315174004-e7b6ba378d09 // indirect
 	golang.org/x/crypto v0.31.0 // indirect
 	golang.org/x/sys v0.28.0 // indirect
 	golang.org/x/text v0.21.0 // indirect
 )
-replace gitlab.com/smwbalfe/spotify-client => K:\core\DEV\PROJECTS\playlist-archive\go-spotify-client

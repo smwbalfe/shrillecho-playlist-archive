@@ -1,7 +1,7 @@
 package interfaces
 
 import (
-	"backend/pkg/client/shared"
+	"github.com/smwbalfe/shrillecho-playlist-archive/backend/pkg/client/shared"
 	"net/http"
 )
 

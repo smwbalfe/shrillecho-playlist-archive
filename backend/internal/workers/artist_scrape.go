@@ -1,17 +1,17 @@
 package workers
 
 import (
-	"backend/internal/config"
-	"backend/internal/repository"
-	"backend/internal/services"
-	"backend/internal/transport"
+	"github.com/smwbalfe/shrillecho-playlist-archive/backend/internal/config"
+	"github.com/smwbalfe/shrillecho-playlist-archive/backend/internal/repository"
+	"github.com/smwbalfe/shrillecho-playlist-archive/backend/internal/services"
+	"github.com/smwbalfe/shrillecho-playlist-archive/backend/internal/transport"
 	"context"
 	"fmt"
 	"log"
 	"sync"
 
 	"github.com/gorilla/websocket"
-	client "backend/pkg/client"
+	client "github.com/smwbalfe/shrillecho-playlist-archive/backend/pkg/client"
 )
 
 type ArtistScrapeWorker struct {

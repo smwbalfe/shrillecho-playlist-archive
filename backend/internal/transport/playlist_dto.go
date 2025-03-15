@@ -1,7 +1,7 @@
 package transport
 
 import (
-	"backend/internal/domain"
+	"github.com/smwbalfe/shrillecho-playlist-archive/backend/internal/domain"
 )
 
 type PlaylistResponse struct {

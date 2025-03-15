@@ -6,8 +6,7 @@ import (
 	"log"
 	"scraper/internal/config"
 	"scraper/internal/services"
-
-	client "gitlab.com/smwbalfe/spotify-client"
+	client "github.com/smwbalfe/shrillecho-playlist-archive/backend/pkg/client"
 )
 
 type ArtistScrapeWorker struct {

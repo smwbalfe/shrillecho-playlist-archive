@@ -1,12 +1,12 @@
 package config
 
 import (
-	"backend/internal/db"
-	"backend/internal/repository"
-	service "backend/internal/services"
+	"github.com/smwbalfe/shrillecho-playlist-archive/backend/internal/db"
+	"github.com/smwbalfe/shrillecho-playlist-archive/backend/internal/repository"
+	service "github.com/smwbalfe/shrillecho-playlist-archive/backend/internal/services"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/redis/go-redis/v9"
-	client "backend/pkg/client"
+	client "github.com/smwbalfe/shrillecho-playlist-archive/backend/pkg/client"
 )
 
 type DatabaseConnections struct {

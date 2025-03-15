@@ -1,16 +1,16 @@
 package service
 
 import (
-	"backend/internal/domain"
-	"backend/internal/utils"
+	"github.com/smwbalfe/shrillecho-playlist-archive/backend/internal/domain"
+	"github.com/smwbalfe/shrillecho-playlist-archive/backend/internal/utils"
 	"context"
 	"fmt"
 	"sync"
 
 	"github.com/rs/zerolog/log"
-	client "backend/pkg/client"
-	artModels "backend/pkg/client/endpoints/artist/models"
-	plModels "backend/pkg/client/endpoints/playlist/models"
+	client "github.com/smwbalfe/shrillecho-playlist-archive/backend/pkg/client"
+	artModels "github.com/smwbalfe/shrillecho-playlist-archive/backend/pkg/client/endpoints/artist/models"
+	plModels "github.com/smwbalfe/shrillecho-playlist-archive/backend/pkg/client/endpoints/playlist/models"
 )
 
 type SpotifyService struct {

@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"backend/internal/db"
+	"github.com/smwbalfe/shrillecho-playlist-archive/backend/internal/db"
 	"context"
 
 	"github.com/jackc/pgx/v5/pgtype"

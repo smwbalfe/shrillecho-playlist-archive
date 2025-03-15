@@ -1,7 +1,7 @@
 package models
 
 import (
-	sharedModels "backend/pkg/client/shared"
+	sharedModels "github.com/smwbalfe/shrillecho-playlist-archive/backend/pkg/client/shared"
 )
 
 type ArtistResponse struct {

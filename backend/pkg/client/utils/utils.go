@@ -3,7 +3,7 @@ package utils
 import (
 	"compress/gzip"
 	"fmt"
-	"backend/pkg/client/shared"
+	"github.com/smwbalfe/shrillecho-playlist-archive/backend/pkg/client/shared"
 	"io"
 	"net/http"
 	"os"

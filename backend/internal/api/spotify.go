@@ -1,9 +1,9 @@
 package api
 
 import (
-	"backend/internal/domain"
-	"backend/internal/transport"
-	"backend/internal/utils"
+	"github.com/smwbalfe/shrillecho-playlist-archive/backend/internal/domain"
+	"github.com/smwbalfe/shrillecho-playlist-archive/backend/internal/transport"
+	"github.com/smwbalfe/shrillecho-playlist-archive/backend/internal/utils"
 	"net/http"
 )
 

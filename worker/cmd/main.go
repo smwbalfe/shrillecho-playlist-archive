@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/redis/go-redis/v9"
 	"github.com/rs/zerolog/log"
-	"gitlab.com/smwbalfe/spotify-client"
+	"github.com/smwbalfe/shrillecho-playlist-archive/backend/pkg/client"
 	"os"
 	"os/signal"
 	"scraper/internal/config"
@@ -18,6 +18,7 @@ import (
 
 func InitializeServices(dbs *config.DatabaseConnections) (*config.AppServices, error) {
 	spClient, err := client.NewSpotifyClient()
+	
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialize spotify client: %w", err)
 	}

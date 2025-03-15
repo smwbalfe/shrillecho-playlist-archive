@@ -7,11 +7,11 @@ import (
 	"net/http"
 	"net/url"
 
-	"backend/pkg/client/endpoints/artist"
-	"backend/pkg/client/endpoints/playlist"
-	"backend/pkg/client/endpoints/user"
-	shared "backend/pkg/client/shared"
-	"backend/pkg/client/utils"
+	"github.com/smwbalfe/shrillecho-playlist-archive/backend/pkg/client/endpoints/artist"
+	"github.com/smwbalfe/shrillecho-playlist-archive/backend/pkg/client/endpoints/playlist"
+	"github.com/smwbalfe/shrillecho-playlist-archive/backend/pkg/client/endpoints/user"
+	shared "github.com/smwbalfe/shrillecho-playlist-archive/backend/pkg/client/shared"
+	"github.com/smwbalfe/shrillecho-playlist-archive/backend/pkg/client/utils"
 )
 
 const (

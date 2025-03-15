@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"backend/pkg/client/utils"
+	"github.com/smwbalfe/shrillecho-playlist-archive/backend/pkg/client/utils"
 	"net/http"
 )
 

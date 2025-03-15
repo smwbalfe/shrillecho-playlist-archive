@@ -1,19 +1,19 @@
 package main
 
 import (
-	"backend/internal/api"
-	"backend/internal/config"
-	"backend/internal/db"
-	"backend/internal/repository"
-	"backend/internal/services"
-	"backend/internal/utils"
-	"backend/internal/workers"
+	"github.com/smwbalfe/shrillecho-playlist-archive/backend/internal/api"
+	"github.com/smwbalfe/shrillecho-playlist-archive/backend/internal/config"
+	"github.com/smwbalfe/shrillecho-playlist-archive/backend/internal/db"
+	"github.com/smwbalfe/shrillecho-playlist-archive/backend/internal/repository"
+	"github.com/smwbalfe/shrillecho-playlist-archive/backend/internal/services"
+	"github.com/smwbalfe/shrillecho-playlist-archive/backend/internal/utils"
+	"github.com/smwbalfe/shrillecho-playlist-archive/backend/internal/workers"
 	"context"
 	"fmt"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/redis/go-redis/v9"
 	"github.com/rs/zerolog/log"
-	"backend/pkg/client"
+	"github.com/smwbalfe/shrillecho-playlist-archive/backend/pkg/client"
 	"net/http"
 )
 

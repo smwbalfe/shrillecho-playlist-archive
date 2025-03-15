@@ -10,7 +10,7 @@ import (
 	"github.com/gofrs/uuid/v5"
 	"github.com/rs/zerolog/log"
 
-	"backend/internal/utils"
+	"github.com/smwbalfe/shrillecho-playlist-archive/backend/internal/utils"
 )
 
 func (a *api) CollectPlaylists(w http.ResponseWriter, r *http.Request) {

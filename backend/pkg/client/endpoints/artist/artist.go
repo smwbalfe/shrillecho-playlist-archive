@@ -3,8 +3,8 @@ package artist
 import (
 	"encoding/json"
 	"fmt"
-	models "backend/pkg/client/endpoints/artist/models"
-	"backend/pkg/client/interface"
+	models "github.com/smwbalfe/shrillecho-playlist-archive/backend/pkg/client/endpoints/artist/models"
+	"github.com/smwbalfe/shrillecho-playlist-archive/backend/pkg/client/interface"
 	"net/url"
 	"strings"
 )

@@ -1,13 +1,13 @@
 package api
 
 import (
-	"backend/internal/services"
-	"backend/internal/transport"
-	"backend/internal/utils"
+	"github.com/smwbalfe/shrillecho-playlist-archive/backend/internal/services"
+	"github.com/smwbalfe/shrillecho-playlist-archive/backend/internal/transport"
+	"github.com/smwbalfe/shrillecho-playlist-archive/backend/internal/utils"
 	"fmt"
 	"github.com/gofrs/uuid/v5"
 	"github.com/jackc/pgx/v5/pgtype"
-	models "backend/pkg/client/endpoints/playlist/models"
+	models "github.com/smwbalfe/shrillecho-playlist-archive/backend/pkg/client/endpoints/playlist/models"
 	"net/http"
 )
 

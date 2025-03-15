@@ -9,7 +9,6 @@ import (
 	"github.com/rs/zerolog/log"
 	"scraper/internal/utils"
 	"sync"
-
 	sp "gitlab.com/smwbalfe/spotify-client"
 	artModels "gitlab.com/smwbalfe/spotify-client/endpoints/artist/models"
 )

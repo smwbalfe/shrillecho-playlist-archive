@@ -1,7 +1,7 @@
 package transport
 
 import (
-	models "backend/pkg/client/endpoints/artist/models"
+	models "github.com/smwbalfe/shrillecho-playlist-archive/backend/pkg/client/endpoints/artist/models"
 )
 
 type ScrapeRequest struct {
