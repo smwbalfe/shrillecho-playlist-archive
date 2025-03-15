@@ -6,6 +6,7 @@ type SimpleTrack struct {
 	Artists   []ArtistSimple `json:"artists"`
 	Playcount string         `json:"playcount"`
 	CoverArt  CoverArt       `json:"coverArt"`
+	Genres []string 		`json:"genres"`
 }
 
 type ArtistSimple struct {

@@ -1,2 +1,2 @@
-import { Index } from "@/src/lib/views/index"
-export default Index
+import { Index } from "@/src/lib/features/home/index";
+export default Index;

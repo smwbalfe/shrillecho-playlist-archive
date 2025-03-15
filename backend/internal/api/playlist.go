@@ -28,7 +28,7 @@ func (a *api) CollectPlaylists(w http.ResponseWriter, r *http.Request) {
 	}
 
 	pool, err := utils.ParseQueryInt(r.URL.Query().Get("pool"))
-	
+
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return

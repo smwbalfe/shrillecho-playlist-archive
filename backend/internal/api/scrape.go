@@ -5,11 +5,10 @@ import (
 	"backend/internal/transport"
 	"backend/internal/utils"
 	"fmt"
-	"net/http"
-
 	"github.com/gofrs/uuid/v5"
 	"github.com/jackc/pgx/v5/pgtype"
-	"gitlab.com/smwbalfe/spotify-client/data"
+	models "backend/pkg/client/endpoints/playlist/models"
+	"net/http"
 )
 
 func (a *api) ArtistScrape(w http.ResponseWriter, r *http.Request) {
@@ -19,7 +18,7 @@ func (a *api) ArtistScrape(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	artistBase62 , err := utils.ParseSpotifyId(scraperRequest.Artist)
+	artistBase62, err := utils.ParseSpotifyId(scraperRequest.Artist)
 	if err != nil {
 		http.Error(w, "invalid artist format requested", http.StatusInternalServerError)
 		return
@@ -33,7 +32,6 @@ func (a *api) ArtistScrape(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "JWT not found in context", http.StatusInternalServerError)
 		return
 	}
-
 
 	scrape, err := a.scrapeRepo.CreateScrape(r.Context(), pgtype.UUID{Bytes: userID, Valid: true})
 	if err != nil {
@@ -54,21 +52,20 @@ func (a *api) ArtistScrape(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	
 
 	utils.Json(w, r, transport.ScrapeTriggerResponse{ScrapeID: "yes"})
 }
 
-func collectUniqueArtists(tracks []data.Track) []string{
-	artistSet:=make(map[string]struct{})
-	uniqueArtists:=[]string{}
-	for _,track:=range tracks{
-		for _,artist:=range track.Artists.Items{
-			artistID:=utils.ExtractSpotifyIDColon(artist.URI)
-			if _,exists:=artistSet[artistID];!exists{
-				artistSet[artistID]=struct{}{}
-				uniqueArtists=append(uniqueArtists,artistID)
-				if len(uniqueArtists)>=5{
+func collectUniqueArtists(tracks []models.Track) []string {
+	artistSet := make(map[string]struct{})
+	uniqueArtists := []string{}
+	for _, track := range tracks {
+		for _, artist := range track.Artists.Items {
+			artistID := utils.ExtractSpotifyIDColon(artist.URI)
+			if _, exists := artistSet[artistID]; !exists {
+				artistSet[artistID] = struct{}{}
+				uniqueArtists = append(uniqueArtists, artistID)
+				if len(uniqueArtists) >= 5 {
 					return uniqueArtists
 				}
 			}
@@ -77,18 +74,24 @@ func collectUniqueArtists(tracks []data.Track) []string{
 	return uniqueArtists
 }
 
-func (a *api) PlaylistSeededScrape(w http.ResponseWriter, r *http.Request){
+func (a *api) PlaylistSeededScrape(w http.ResponseWriter, r *http.Request) {
 	playlistID := r.URL.Query().Get("id")
 
 	userID, ok := r.Context().Value("user").(uuid.UUID)
-
 
 	if !ok {
 		http.Error(w, "JWT not found in context", http.StatusInternalServerError)
 		return
 	}
 
-	tracks, err := a.spotify.GetPlaylistTracksExpanded(playlistID)
+	parsedID, err := utils.ParseSpotifyId(playlistID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	tracks, err := a.spotifyService.GetTracksExpanded(parsedID)
+
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

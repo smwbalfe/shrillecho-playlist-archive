@@ -11,7 +11,7 @@ import (
 	"sync"
 
 	"github.com/gorilla/websocket"
-	client "gitlab.com/smwbalfe/spotify-client"
+	client "backend/pkg/client"
 )
 
 type ArtistScrapeWorker struct {

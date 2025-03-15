@@ -13,7 +13,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/redis/go-redis/v9"
 	"github.com/rs/zerolog/log"
-	"gitlab.com/smwbalfe/spotify-client"
+	"backend/pkg/client"
 	"net/http"
 )
 
@@ -29,16 +29,18 @@ func InitializeServices(dbs *config.DatabaseConnections) (*config.AppServices, e
 	return &config.AppServices{
 		ScrapeRepo: scrapeRepo,
 		Queue:      scrapeQueue,
-		Spotify:    &spClient,
+		Spotify:    spClient,
 	}, nil
 }
 
 func InitializeDatabases(env *config.Environment) (*config.DatabaseConnections, error) {
+	
 	rdb := redis.NewClient(&redis.Options{
 		Addr:     fmt.Sprintf("%v:%v", env.RedisHost, env.RedisPort),
 		Password: "",
 		DB:       0,
 	})
+
 	if _, err := rdb.Ping(context.Background()).Result(); err != nil {
 		return nil, fmt.Errorf("failed to connect to redis: %w", err)
 	}

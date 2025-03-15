@@ -9,7 +9,7 @@ import (
 
 func (a *api) PlaylistHandler(w http.ResponseWriter, r *http.Request) {
 	playlistID := r.URL.Query().Get("id")
-	playlistTracks, err := a.spotify.GetPlaylistTracksExpanded(playlistID)
+	playlistTracks, err := a.spotifyService.GetTracksExpanded(playlistID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -18,31 +18,21 @@ func (a *api) PlaylistHandler(w http.ResponseWriter, r *http.Request) {
 	utils.Json(w, r, transport.PlaylistResponse{Playlists: sortedTracks})
 }
 
-
-type CreatePlaylistRequest struct {
-	Tracks []string `json:"tracks"`
-}
-
-type CreatePlaylistResponse struct {
-	Link string `json:"link"`
-}
-
-
-func (a *api) AddToPlaylist(w http.ResponseWriter, r *http.Request){
-	var createPlaylist CreatePlaylistRequest
+func (a *api) AddToPlaylist(w http.ResponseWriter, r *http.Request) {
+	var createPlaylist transport.CreatePlaylistRequest
 	if err := utils.ParseBody(r, &createPlaylist); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	userID, err := a.spotify.GetCurrentUserID()
+	userID, err := a.spotify.Users.GetCurrentID()
 	if err != nil {
 		panic(err)
 	}
-	link, err := a.spotify.CreatePlaylistFromTracks(createPlaylist.Tracks, userID)
-	if err != nil{
+	link, err := a.spotify.Playlists.Create(createPlaylist.Tracks, userID, "Track Collection")
+	if err != nil {
 		panic(err)
 	}
-	utils.Json(w,r, CreatePlaylistResponse{Link: link})
+	utils.Json(w, r, transport.CreatePlaylistResponse{Link: link})
 }
 
 func (a *api) ReadPlaylistGenres(w http.ResponseWriter, r *http.Request) {
@@ -51,7 +41,7 @@ func (a *api) ReadPlaylistGenres(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "no playlist ID provided", http.StatusInternalServerError)
 		return
 	}
-	playlistGenres, err := a.spotifyService.GetPlaylistGenres(playlistID)
+	playlistGenres, err := a.spotifyService.GetPlaylistGenres(r.Context(), playlistID)
 	if err != nil {
 		http.Error(w, "no playlist ID provided", http.StatusInternalServerError)
 		return
@@ -68,7 +58,7 @@ func (a *api) FilterPlaylists(w http.ResponseWriter, r *http.Request) {
 	var allSimpleTracks []domain.SimpleTrack
 
 	for _, playlist := range filterRequest.PlaylistsToFilter {
-		loadedTracks, err := a.spotify.GetPlaylistTracksExpanded(playlist)
+		loadedTracks, err := a.spotifyService.GetTracksExpanded(playlist)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -94,7 +84,7 @@ func (a *api) FilterPlaylists(w http.ResponseWriter, r *http.Request) {
 	if filterRequest.ApplyUnique {
 		var removeTracks []domain.SimpleTrack
 		for _, uPlaylist := range filterRequest.PlaylistsToRemove {
-			tracks, err := a.spotify.GetPlaylistTracksExpanded(uPlaylist)
+			tracks, err := a.spotifyService.GetTracksExpanded(uPlaylist)
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
@@ -109,7 +99,6 @@ func (a *api) FilterPlaylists(w http.ResponseWriter, r *http.Request) {
 		}
 		allSimpleTracks = dedupedTracks
 	}
-
-	_ = min(len(allSimpleTracks), filterRequest.TrackLimit)
+	allSimpleTracks = utils.RemoveArtists(allSimpleTracks, []string{"ILLENIUM"})
 	utils.Json(w, r, transport.FilterPlaylistResponse{Tracks: allSimpleTracks})
 }

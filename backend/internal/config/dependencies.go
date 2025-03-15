@@ -4,11 +4,9 @@ import (
 	"backend/internal/db"
 	"backend/internal/repository"
 	service "backend/internal/services"
-
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/redis/go-redis/v9"
-
-	client "gitlab.com/smwbalfe/spotify-client"
+	client "backend/pkg/client"
 )
 
 type DatabaseConnections struct {

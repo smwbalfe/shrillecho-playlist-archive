@@ -2,18 +2,17 @@ package service
 
 import (
 	"context"
-
-	"gitlab.com/smwbalfe/spotify-client/data"
+	artModels "backend/pkg/client/endpoints/artist/models"
 )
 
 type ScrapeJob struct {
-	ID           int64         `json:"id"`
-	Artist       string        `json:"artist"`
-	Depth        int           `json:"depth"`
-	Status       string        `json:"status"`
-	Error        string        `json:"error,omitempty"`
-	Artists      []data.Artist `json:"artists,omitempty"`
-	TotalArtists int           `json:"total_artists"`
+	ID           int64              `json:"id"`
+	Artist       string             `json:"artist"`
+	Depth        int                `json:"depth"`
+	Status       string             `json:"status"`
+	Error        string             `json:"error,omitempty"`
+	Artists      []artModels.Artist `json:"artists,omitempty"`
+	TotalArtists int                `json:"total_artists"`
 }
 
 type Queue interface {

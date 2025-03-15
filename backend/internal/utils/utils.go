@@ -6,7 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/redis/go-redis/v9"
-	data "gitlab.com/smwbalfe/spotify-client/data"
+	models "backend/pkg/client/endpoints/playlist/models"
 	"io"
 	"net/http"
 	"net/url"
@@ -61,7 +61,7 @@ func ParseBody(r *http.Request, item any) error {
 	return nil
 }
 
-func GetTrackMetadata(track data.Track) (string, string) {
+func GetTrackMetadata(track models.Track) (string, string) {
 	var artist string
 	if len(track.Artists.Items) > 0 {
 		artist = track.Artists.Items[0].URI
@@ -116,6 +116,49 @@ func ExtractSpotifyID(input string) (string, error) {
 	return strings.Split(id, "?")[0], nil
 }
 
+func RemoveDuplicates(playlist []domain.PlaylistArchiveItem) []domain.PlaylistArchiveItem {
+	seen := make(map[string]bool)
+	result := make([]domain.PlaylistArchiveItem, 0, len(playlist))
+	for _, item := range playlist {
+		if !seen[item.URI] {
+			seen[item.URI] = true
+			result = append(result, item)
+		}
+	}
+	return result
+}
+
+func ExtractID(id string) (string, error) {
+	splitString := strings.Split(id, ":")
+	if len(splitString) > 2 {
+		return splitString[2], nil
+	}
+	return "", fmt.Errorf("invalid ID format: %s - expected at least 3 parts separated by ':'", id)
+}
+
+func RemoveArtists(allSimpleTracks []domain.SimpleTrack, excludedArtists []string) []domain.SimpleTrack {
+	excludedMap := make(map[string]struct{})
+	for _, artist := range excludedArtists {
+		excludedMap[artist] = struct{}{}
+	}
+	filteredTracks := []domain.SimpleTrack{}
+	for _, track := range allSimpleTracks {
+		excluded := false
+		for _, artist := range track.Artists {
+			if _, exists := excludedMap[artist.Name]; exists {
+				fmt.Printf("removing: %v", artist.Name)
+				excluded = true
+				break
+			}
+		}
+		if !excluded {
+			filteredTracks = append(filteredTracks, track)
+		}
+	}
+
+	return filteredTracks
+}
+
 func ExtractSpotifyIDColon(uri string) string {
 	parts := strings.Split(uri, ":")
 	if len(parts) == 3 {
@@ -124,7 +167,7 @@ func ExtractSpotifyIDColon(uri string) string {
 	return ""
 }
 
-func SortTracksByPlaycount(tracks []data.Track) []domain.SimplifiedTrack {
+func SortTracksByPlaycount(tracks []models.Track) []domain.SimplifiedTrack {
 	simplified := make([]domain.SimplifiedTrack, 0)
 	for _, track := range tracks {
 		playcount, err := strconv.Atoi(track.Playcount)
@@ -148,7 +191,7 @@ func SortTracksByPlaycount(tracks []data.Track) []domain.SimplifiedTrack {
 	return simplified
 }
 
-func GetSimpleTrack(track data.Track) domain.SimpleTrack {
+func GetSimpleTrack(track models.Track) domain.SimpleTrack {
 	var artists []domain.ArtistSimple
 	for _, artist := range track.Artists.Items {
 		artists = append(artists, domain.ArtistSimple{
@@ -171,6 +214,7 @@ func GetSimpleTrack(track data.Track) domain.SimpleTrack {
 		CoverArt: domain.CoverArt{
 			Sources: sources,
 		},
+		Genres: track.Genres,
 	}
 	return simpleTrack
 }
@@ -196,4 +240,3 @@ func ParseSpotifyId(input string) (string, error) {
 	}
 	return "", fmt.Errorf("invalid Spotify identifier format: %s", input)
 }
-

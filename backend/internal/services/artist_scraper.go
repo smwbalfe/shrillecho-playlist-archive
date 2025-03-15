@@ -1,16 +1,17 @@
 package service
 
 import (
-	"backend/internal/utils"
 	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"sync"
+
+	"backend/internal/utils"
 	"github.com/redis/go-redis/v9"
 	"github.com/rs/zerolog/log"
-	sp "gitlab.com/smwbalfe/spotify-client"
-	data "gitlab.com/smwbalfe/spotify-client/data"
-	"sync"
+	sp "backend/pkg/client"
+	artModels "backend/pkg/client/endpoints/artist/models"
 )
 
 type ArtistScraperService struct {
@@ -27,15 +28,20 @@ func NewArtistScraperService(redis *redis.Client, spClient *sp.SpotifyClient, wo
 	}
 }
 
+func (s *ArtistScraperService) ParseRelated(relatedFront artModels.ArtistRelated) []artModels.Artist {
+	return relatedFront.Data.ArtistUnion.RelatedContent.RelatedArtists.Items
+}
+
 func (s *ArtistScraperService) initialScrapeSetup(ctx context.Context, scrapeID int64, rootArtist string) error {
-	relatedArtists, err := s.Spotify.GetRelatedArtists(rootArtist)
+	relatedArtists, err := s.Spotify.Artists.GetRelated(rootArtist)
+	paredRelatedArtists := s.ParseRelated(relatedArtists)
 	if err != nil {
 		return err
 	}
 	pipe := s.RedisStore.Pipeline()
 	pipe.SAdd(ctx, fmt.Sprintf("%v:artists:seen", scrapeID), rootArtist)
 	pipe.HSet(ctx, fmt.Sprintf("%v:artists:depth", scrapeID), rootArtist, 0)
-	for _, artist := range relatedArtists {
+	for _, artist := range paredRelatedArtists {
 		artistJSON, err := json.Marshal(artist)
 		if err != nil {
 			log.Error().Msg(fmt.Sprintf("Failed to marshal artist: %v", err))
@@ -91,14 +97,16 @@ func (s *ArtistScraperService) worker(ctx context.Context, scrapeID int64, maxDe
 				continue
 			}
 
-			relatedArtists, err := s.Spotify.GetRelatedArtists(artist)
+			relatedArtists, err := s.Spotify.Artists.GetRelated(artist)
 			if err != nil {
 				log.Error().Msg(err.Error())
 				continue
 			}
 
+			parsedRelatedArtists := s.ParseRelated(relatedArtists)
+
 			pipe := s.RedisStore.Pipeline()
-			for _, relatedArtist := range relatedArtists {
+			for _, relatedArtist := range parsedRelatedArtists {
 				isMember, err := s.RedisStore.SIsMember(ctx, fmt.Sprintf("%v:artists:seen", scrapeID), relatedArtist.ID).Result()
 				if err != nil {
 					log.Error().Msg(err.Error())
@@ -125,22 +133,22 @@ func (s *ArtistScraperService) worker(ctx context.Context, scrapeID int64, maxDe
 	}
 }
 
-func (s *ArtistScraperService) TriggerArtistScrape(ctx context.Context, scrapeID int64, seedArtist string, depth int) ([]data.Artist, error) {
+func (s *ArtistScraperService) TriggerArtistScrape(ctx context.Context, scrapeID int64, seedArtist string, depth int) ([]artModels.Artist, error) {
 	artistID, err := utils.ExtractSpotifyID(seedArtist)
 	if err != nil {
-		return []data.Artist{}, errors.New(fmt.Sprintf("failed to parse spotify ID: %v", err))
+		return []artModels.Artist{}, errors.New(fmt.Sprintf("failed to parse spotify ID: %v", err))
 	}
 	err = s.ScrapeArtists(scrapeID, artistID, depth)
 	if err != nil {
-		return []data.Artist{}, errors.New(fmt.Sprintf("failed to scrape artists: %v", err))
+		return []artModels.Artist{}, errors.New(fmt.Sprintf("failed to scrape artists: %v", err))
 	}
-	var artists []data.Artist
+	var artists []artModels.Artist
 	artistsData, err := s.RedisStore.HGetAll(ctx, fmt.Sprintf("%v:artists:data", scrapeID)).Result()
 	if err != nil {
-		return []data.Artist{}, nil
+		return []artModels.Artist{}, nil
 	}
 	for _, artistJSON := range artistsData {
-		var artist data.Artist
+		var artist artModels.Artist
 		if err := json.Unmarshal([]byte(artistJSON), &artist); err != nil {
 			continue
 		}

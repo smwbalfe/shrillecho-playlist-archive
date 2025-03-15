@@ -10,7 +10,6 @@ require (
 	github.com/jackc/pgx/v5 v5.7.2
 	github.com/redis/go-redis/v9 v9.7.0
 	github.com/rs/zerolog v1.33.0
-	gitlab.com/smwbalfe/spotify-client v0.0.0-20250131150141-a0ae10cdef46
 	go.mongodb.org/mongo-driver v1.17.2
 )
 
@@ -35,5 +34,3 @@ require (
 	golang.org/x/sys v0.28.0 // indirect
 	golang.org/x/text v0.21.0 // indirect
 )
-
-replace gitlab.com/smwbalfe/spotify-client => K:\core\DEV\PROJECTS\playlist-archive\go-spotify-client

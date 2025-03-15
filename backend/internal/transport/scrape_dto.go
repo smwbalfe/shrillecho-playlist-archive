@@ -1,6 +1,8 @@
 package transport
 
-import "gitlab.com/smwbalfe/spotify-client/data"
+import (
+	models "backend/pkg/client/endpoints/artist/models"
+)
 
 type ScrapeRequest struct {
 	Artist string `json:"artist"`
@@ -8,7 +10,7 @@ type ScrapeRequest struct {
 }
 
 type ScrapeResponse struct {
-	Artists []data.Artist `json:"artists"`
+	Artists []models.Artist `json:"artists"`
 }
 
 type ScrapeTriggerResponse struct {

@@ -16,7 +16,7 @@ import (
 	"github.com/go-chi/cors"
 	"github.com/gorilla/websocket"
 	"github.com/rs/zerolog/log"
-	client "gitlab.com/smwbalfe/spotify-client"
+	client "backend/pkg/client"
 )
 
 var upgrader = websocket.Upgrader{
@@ -92,9 +92,7 @@ func (a *api) Routes() *chi.Mux {
 	})
 
 	r.Group(func(r chi.Router) {
-
 		r.Use(middleware.CheckAuth)
-		
 		r.Route("/spotify", func(r chi.Router) {
 			r.Get("/playlist", a.PlaylistHandler)
 			r.Get("/playlists/genres", a.ReadPlaylistGenres)
@@ -104,9 +102,8 @@ func (a *api) Routes() *chi.Mux {
 	})
 
 	r.Group(func(r chi.Router) {
-
 		r.Use(middleware.CheckAuth)
-
+		
 		r.Route("/scrape", func(r chi.Router) {
 			r.Post("/artists", a.ArtistScrape)
 			r.Get("/playlists", a.CollectPlaylists)
